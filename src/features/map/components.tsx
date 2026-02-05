@@ -24,13 +24,13 @@ interface Filters {
   preferredTimes: string[];
 }
 
-export function FilterChipBar({
+export const FilterChipBar = ({
   filters,
   onFiltersChange,
 }: {
   filters: Filters;
   onFiltersChange: any;
-}) {
+}) => {
   const toggleFilter = (category: keyof Filters, value: string) => {
     const current = filters[category];
     const updated = current.includes(value)
@@ -87,16 +87,16 @@ export function FilterChipBar({
       </div>
     </div>
   );
-}
+};
 
 // ============ MateListCard (핵심 컴포넌트) ============
-export function MateListCard({
+export const MateListCard = ({
   data,
   onClick,
 }: {
   data: MapMarker;
   onClick: () => void;
-}) {
+}) => {
   return (
     <Card
       onClick={onClick}
@@ -158,14 +158,14 @@ export function MateListCard({
       </div>
     </Card>
   );
-}
+};
 
 // ============ MapPlaceholder (지도 뷰) ============
-export function MapPlaceholder({
+export const MapPlaceholder = ({
   markers,
   onMarkerClick,
   selectedMarkerId,
-}: any) {
+}: any) => {
   return (
     <div className="absolute inset-0 bg-[#E9ECEF] w-full h-full">
       {/* Map Background Pattern */}
@@ -215,10 +215,10 @@ export function MapPlaceholder({
       ))}
     </div>
   );
-}
+};
 
 // ============ MateDetailSheet ============
-export function MateDetailSheet({ marker, onClose, onRequestWalk }: any) {
+export const MateDetailSheet = ({ marker, onClose, onRequestWalk }: any) => {
   if (!marker) return null;
 
   return (
@@ -294,4 +294,4 @@ export function MateDetailSheet({ marker, onClose, onRequestWalk }: any) {
       </div>
     </>
   );
-}
+};

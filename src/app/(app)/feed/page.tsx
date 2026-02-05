@@ -9,7 +9,7 @@ import { Bell, ImageOff } from "lucide-react";
 type DemoState = "default" | "empty";
 const DEMO_STATE: DemoState = "default";
 
-export default function FeedPage() {
+const FeedPage = () => {
   const posts = DEMO_STATE === "empty" ? [] : FEED_POSTS;
 
   return (
@@ -46,4 +46,6 @@ export default function FeedPage() {
       </div>
     </div>
   );
-}
+};
+
+export default FeedPage;

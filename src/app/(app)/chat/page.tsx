@@ -9,7 +9,7 @@ import { MessageSquare } from "lucide-react";
 type DemoState = "default" | "empty";
 const DEMO_STATE: DemoState = "default";
 
-export default function ChatPage() {
+const ChatPage = () => {
   const rooms = DEMO_STATE === "empty" ? [] : CHAT_ROOMS;
 
   return (
@@ -35,4 +35,6 @@ export default function ChatPage() {
       </div>
     </div>
   );
-}
+};
+
+export default ChatPage;

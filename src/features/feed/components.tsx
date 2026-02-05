@@ -17,7 +17,7 @@ interface FeedCardProps {
   post: FeedPost;
 }
 
-export function FeedCard({ post }: FeedCardProps) {
+export const FeedCard = ({ post }: FeedCardProps) => {
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [likeCount, setLikeCount] = useState(post.likes);
 
@@ -111,10 +111,10 @@ export function FeedCard({ post }: FeedCardProps) {
       </div>
     </Card>
   );
-}
+};
 
 // ============ FeedWidget (Clean List Style) ============
-export function FeedWidget() {
+export const FeedWidget = () => {
   return (
     <div className="space-y-6">
       {/* Popular Tags */}
@@ -162,4 +162,4 @@ export function FeedWidget() {
       </div>
     </div>
   );
-}
+};

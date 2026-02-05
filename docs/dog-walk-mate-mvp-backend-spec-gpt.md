@@ -2,6 +2,17 @@
 
 본 문서는 사용자가 작성한 v1 기획서를 **NestJS + Prisma + Postgres(PostGIS)** 기준으로 “바로 구현 가능한 수준”으로 재정리한 **MVP 중심 기능 기획서**다.
 
+## 문서 사용 방식(중요: AI 협업/학습 운영 원칙)
+
+- 이 프로젝트는 **AI와 협업**하되, AI가 코드를 “자동 구현/자동 수정”하는 방식이 아니라
+  - AI는 설계/코드/쿼리/폴더 구조를 **제안**하고
+  - 사용자는 제안을 **검증한 뒤 직접 작성/수정**한다.
+- 구현 진행 시, 각 기능(슬라이스)마다 아래를 기본 산출물로 한다.
+  - API 계약(요청/응답/에러 코드)
+  - DB 스키마/인덱스/쿼리
+  - 서버(Nest) 구현 포인트(Guard/Service/Repository)
+  - 프론트(Next) 연동 포인트(토큰/에러 처리/상태)
+
 ## 0) 결론(적용 적합성 요약)
 
 - **적합(핵심 요구 충족)**
@@ -76,7 +87,16 @@
   - 소셜 로그인은 2차(선택)
 - 토큰
   - **JWT Access Token 필수**
-  - Refresh Token은 선택(초기 단순화를 위해 생략 가능)
+  - **Access Token 만료: 3시간**
+  - **Refresh Token 만료: 30일**
+  - Refresh Token은 **사용**
+  - 클라이언트는 REST 요청에 `Authorization: Bearer <accessToken>`을 사용
+  - Access 만료 시 `POST /auth/refresh`로 재발급(아래 API 참고)
+  - 클라이언트는 Refresh Token을 저장하고(프론트 구현 전제: localStorage), `POST /auth/refresh` 요청 시 헤더로 전달
+    - 예: `X-Refresh-Token: <refreshToken>`
+  - Refresh Token은 **모든 API 호출에 포함하지 않음**
+    - 오직 토큰 재발급 요청(`/auth/refresh`)에서만 사용
+  - (권장) Refresh Token은 재발급 시 로테이션(기존 Refresh 폐기)하여 탈취 대응
 
 ### A-2. 사용자 프로필
 
@@ -121,6 +141,9 @@
 
 - `visibility=public_approx`인 경우 **저장 시 오프셋 적용**
   - 서버는 원본 좌표를 입력받되 DB에 저장되는 `geom`은 오프셋된 좌표
+- 권장 UX
+  - “내 마커”는 클라이언트가 단말 GPS로 **정확 표시**
+  - `/map/nearby` 응답은 **타인 마커(오프셋된 좌표)** 렌더링에 사용
 - 오프셋 크기(권장): 반경 30~80m
 - 오프셋 안정성(권장): **15분 단위(time bucket)로 고정**
   - 동일 유저는 같은 15분 구간에서는 동일 오프셋(마커가 흔들리지 않음)
@@ -131,12 +154,16 @@
 - 입력
   - 기준 좌표 `lat/lng`
   - `radius`(m, 기본 2000)
+- 인증
+  - 차단/자기 자신 제외 정책을 적용하기 위해 **인증 필요**(현재 사용자 식별)
 - 조건
   - `updatedAt > now() - 15 minutes`
   - `visibility != hidden`
+  - (권장) 자기 자신은 제외(“내 마커”는 클라이언트에서 별도 표시)
+  - (필수) 차단 관계(양방향) 존재 시 서로 제외
   - `ST_DWithin(geom, point, radius)`
 - 응답
-  - 유저 요약 + 강아지 요약 + 거리(m)
+  - 유저 요약 + 강아지 요약 + 마커 좌표(`lat/lng`) + 거리(m)
 - 성능
   - `geom`에 **GIST 인덱스 필수**
   - 쿼리는 `queryRaw`로 수행
@@ -201,6 +228,8 @@
 
 - WS 연결 시 JWT로 인증
   - 권장: Socket.IO `handshake.auth.token`에 Access Token 전달
+- Access Token 만료 처리(권장)
+  - WS 연결/이벤트 처리 중 토큰 만료 시 서버는 에러를 반환하고 클라이언트는 `POST /auth/refresh`로 갱신 후 재연결
 - `joinRoom(roomId)` 시
   - **해당 room에 속한 유저만** join 가능
 - `sendMessage` 시
@@ -272,6 +301,8 @@
   - `/matches/request` 생성 불가
   - `/chats` 목록 및 메시지 조회/전송 불가(권장: room 접근 자체 차단)
   - `/posts` 피드/상세에서 서로의 콘텐츠 숨김
+- 참고
+  - `/map/nearby`는 `queryRaw` 기반이므로 차단 필터를 SQL 단계에서 누락하지 않도록 주의
 
 ---
 
@@ -281,6 +312,7 @@
 
 - `POST /auth/signup`
 - `POST /auth/login`
+- `POST /auth/refresh`
 - `GET /me`
 
 ## 5-2. Profile
@@ -349,6 +381,8 @@
     "userId": "uuid",
     "nickname": "string",
     "profileImageUrl": "https://...",
+    "lat": 37.123456,
+    "lng": 127.123456,
     "dog": {
       "id": "uuid",
       "name": "뽀미",
@@ -568,11 +602,20 @@ SELECT
   u.id AS "userId",
   u.nickname,
   u.profile_image_url AS "profileImageUrl",
+  ST_Y(ul.geom::geometry) AS lat,
+  ST_X(ul.geom::geometry) AS lng,
   ST_Distance(ul.geom, ST_Point($2, $1)::geography) AS distance
 FROM user_location ul
 JOIN users u ON u.id = ul.user_id
 WHERE ul.updated_at > NOW() - INTERVAL '15 minutes'
   AND ul.visibility <> 'hidden'
+  AND u.id <> $4
+  AND NOT EXISTS (
+    SELECT 1
+    FROM block b
+    WHERE (b.blocker_id = $4 AND b.blocked_id = u.id)
+       OR (b.blocker_id = u.id AND b.blocked_id = $4)
+  )
   AND ST_DWithin(ul.geom, ST_Point($2, $1)::geography, $3)
 ORDER BY distance;
 ```
@@ -614,6 +657,7 @@ ORDER BY distance;
 - 인증/인가
   - REST는 Guard로 보호
   - WebSocket은 연결 시 JWT 인증 + room 권한 체크
+  - 클라이언트는 `Authorization: Bearer <accessToken>` 헤더를 사용(프론트 구현 전제)
 - 업로드 파일 검증/제한
   - 이미지: `jpg/png/webp` / 예: 5MB
   - 영상: `mp4/webm` / 예: 50~100MB

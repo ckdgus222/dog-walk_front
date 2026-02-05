@@ -20,7 +20,7 @@ interface ChatListItemProps {
   isSelected?: boolean;
 }
 
-export function ChatListItem({ room, isSelected }: ChatListItemProps) {
+export const ChatListItem = ({ room, isSelected }: ChatListItemProps) => {
   return (
     <Link
       href={ROUTES.CHAT_ROOM(room.id)}
@@ -66,7 +66,7 @@ export function ChatListItem({ room, isSelected }: ChatListItemProps) {
       </div>
     </Link>
   );
-}
+};
 
 // ============ ChatList ============
 interface ChatListProps {
@@ -74,7 +74,7 @@ interface ChatListProps {
   selectedRoomId?: string;
 }
 
-export function ChatList({ rooms, selectedRoomId }: ChatListProps) {
+export const ChatList = ({ rooms, selectedRoomId }: ChatListProps) => {
   return (
     <div className="bg-white">
       {rooms.map((room) => (
@@ -86,7 +86,7 @@ export function ChatList({ rooms, selectedRoomId }: ChatListProps) {
       ))}
     </div>
   );
-}
+};
 
 // ============ ChatWindow ============
 interface ChatWindowProps {
@@ -94,7 +94,7 @@ interface ChatWindowProps {
   showHeader?: boolean;
 }
 
-export function ChatWindow({ roomId, showHeader = true }: ChatWindowProps) {
+export const ChatWindow = ({ roomId, showHeader = true }: ChatWindowProps) => {
   const [inputValue, setInputValue] = useState("");
   const room = getChatRoom(roomId);
   const messages = getChatMessages(roomId);
@@ -224,10 +224,10 @@ export function ChatWindow({ roomId, showHeader = true }: ChatWindowProps) {
       </div>
     </div>
   );
-}
+};
 
 // ============ ChatEmptyState ============
-export function ChatEmptyState() {
+export const ChatEmptyState = () => {
   /* Desktop Only View */
   return (
     <div className="hidden lg:flex flex-col items-center justify-center h-full bg-[#F8F9FA] text-center p-8">
@@ -241,4 +241,4 @@ export function ChatEmptyState() {
       </p>
     </div>
   );
-}
+};

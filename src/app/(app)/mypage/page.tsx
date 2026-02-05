@@ -6,7 +6,7 @@ import { CURRENT_USER, WALK_HISTORY } from "@/lib/mock/user";
 import { formatDate } from "@/lib/utils";
 import { Settings, ChevronRight, Award, Smile } from "lucide-react";
 
-export default function MyPage() {
+const MyPage = () => {
   const user = CURRENT_USER;
 
   return (
@@ -136,4 +136,6 @@ export default function MyPage() {
       </div>
     </div>
   );
-}
+};
+
+export default MyPage;

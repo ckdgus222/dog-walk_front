@@ -22,7 +22,7 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-export function AppShell({ children }: AppShellProps) {
+export const AppShell = ({ children }: AppShellProps) => {
   return (
     <>
       <InteractiveBackground />
@@ -62,10 +62,10 @@ export function AppShell({ children }: AppShellProps) {
       </div>
     </>
   );
-}
+};
 
 // ============ GlassTopNav ============
-function GlassTopNav() {
+const GlassTopNav = () => {
   const pathname = usePathname();
 
   return (
@@ -129,10 +129,10 @@ function GlassTopNav() {
       </div>
     </header>
   );
-}
+};
 
 // ============ MobileNav ============
-function MobileNav() {
+const MobileNav = () => {
   const pathname = usePathname();
   // Safe Icon Mapping
   const iconMap: Record<string, React.ElementType> = {
@@ -180,11 +180,11 @@ function MobileNav() {
       })}
     </div>
   );
-}
+};
 
 // ============ Header Utils (Mobile Only) ============
 
-export function LocationHeader() {
+export const LocationHeader = () => {
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md px-4 h-14 flex items-center justify-between border-b border-[#F1F3F5] lg:hidden">
       <button className="flex items-center gap-1 font-bold text-lg text-[#2D3748]">
@@ -211,9 +211,9 @@ export function LocationHeader() {
       </div>
     </header>
   );
-}
+};
 
-export function PageHeader({ title, action, backButton }: any) {
+export const PageHeader = ({ title, action, backButton }: any) => {
   return (
     <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#F1F3F5] h-14 flex items-center justify-between px-4 lg:hidden">
       <div className="flex items-center gap-3">
@@ -242,4 +242,4 @@ export function PageHeader({ title, action, backButton }: any) {
       {action}
     </div>
   );
-}
+};

@@ -9,7 +9,7 @@ interface ChatRoomPageProps {
   params: Promise<{ roomId: string }>;
 }
 
-export default function ChatRoomPage({ params }: ChatRoomPageProps) {
+const ChatRoomPage = ({ params }: ChatRoomPageProps) => {
   const { roomId } = use(params);
 
   return (
@@ -27,4 +27,6 @@ export default function ChatRoomPage({ params }: ChatRoomPageProps) {
       </div>
     </div>
   );
-}
+};
+
+export default ChatRoomPage;
