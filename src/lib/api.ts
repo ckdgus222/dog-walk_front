@@ -7,6 +7,33 @@ const normalizeEndpoint = (endpoint: string) => {
   return endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
+const unwrapData = <T = unknown>(payload: unknown): T => {
+  if (isRecord(payload) && "data" in payload) {
+    return (payload as { data: T }).data;
+  }
+  return payload as T;
+};
+
+const extractErrorMessage = (payload: unknown): string | null => {
+  if (!isRecord(payload)) return null;
+
+  // Backend standard: { error: { message: string | string[] } }
+  if ("error" in payload && isRecord(payload.error)) {
+    const message = payload.error.message;
+    if (typeof message === "string") return message;
+    if (Array.isArray(message) && message.every((item) => typeof item === "string")) return message.join(", ");
+  }
+
+  // Fallback: { message: string | string[] } (some APIs/framework defaults)
+  const message = payload.message;
+  if (typeof message === "string") return message;
+  if (Array.isArray(message) && message.every((item) => typeof item === "string")) return message.join(", ");
+
+  return null;
+};
+
 export class ApiError extends Error {
   status: number;
   data?: unknown;
@@ -33,18 +60,22 @@ export const apiFetch = async <T = unknown>(endpoint: string, options?: RequestI
     headers,
   });
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const payload = await response.json().catch(() => null);
+
   if (response.status === 401) {
-    throw new ApiError(401, "UNAUTHORIZED");
+    throw new ApiError(401, extractErrorMessage(payload) ?? "UNAUTHORIZED", payload ?? undefined);
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const message =
-      (typeof errorData === "object" && errorData && "message" in errorData ? (errorData as any).message : null) || `API 요청 실패: ${response.status}`;
-    throw new ApiError(response.status, message, errorData);
+    const message = extractErrorMessage(payload) || `API 요청 실패: ${response.status}`;
+    throw new ApiError(response.status, message, payload ?? undefined);
   }
 
-  return response.json() as Promise<T>;
+  return unwrapData<T>(payload);
 };
 
 export const apiFetchFormData = async <T = unknown>(endpoint: string, formData: FormData, options?: Omit<RequestInit, "body">): Promise<T> => {
@@ -62,16 +93,20 @@ export const apiFetchFormData = async <T = unknown>(endpoint: string, formData: 
     body: formData,
   });
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const payload = await response.json().catch(() => null);
+
   if (response.status === 401) {
-    throw new ApiError(401, "UNAUTHORIZED");
+    throw new ApiError(401, extractErrorMessage(payload) ?? "UNAUTHORIZED", payload ?? undefined);
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const message =
-      (typeof errorData === "object" && errorData && "message" in errorData ? (errorData as any).message : null) || `API 요청 실패: ${response.status}`;
-    throw new ApiError(response.status, message, errorData);
+    const message = extractErrorMessage(payload) || `API 요청 실패: ${response.status}`;
+    throw new ApiError(response.status, message, payload ?? undefined);
   }
 
-  return response.json() as Promise<T>;
+  return unwrapData<T>(payload);
 };

@@ -23,11 +23,15 @@ type RefreshResponse = {
 };
 
 type MeResponse = {
-  id: string;
-  email: string;
-  nickname: string;
-  profileImage?: string;
-  bio?: string;
+  user: {
+    id: string;
+    email: string;
+    nickname: string;
+    profileImage?: string;
+    bio?: string;
+    createdAt?: string;
+    updatedAt?: string;
+  };
 };
 
 export const authApi = {

@@ -48,6 +48,7 @@ export const attemptRefresh = async (): Promise<string | null> => {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
     const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Refresh-Token": refreshToken,
@@ -59,11 +60,16 @@ export const attemptRefresh = async (): Promise<string | null> => {
       return null;
     }
 
-    const data = await response.json();
-    setAccessToken(data.accessToken);
-    if (data.refreshToken) {
-      setRefreshToken(data.refreshToken);
+    const payload = await response.json().catch(() => null);
+    const data = payload && typeof payload === "object" && "data" in payload ? (payload as any).data : payload;
+
+    if (!data?.accessToken) {
+      clearAuth();
+      return null;
     }
+
+    setAccessToken(data.accessToken);
+    if (data.refreshToken) setRefreshToken(data.refreshToken);
     return data.accessToken;
   } catch (error) {
     console.error("리프레시 토큰 확인", error);
