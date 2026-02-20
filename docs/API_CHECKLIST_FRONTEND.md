@@ -1,10 +1,15 @@
 # Frontend 기준 Backend API 체크리스트 (UI/코드 기준)
 
 작성일: 2026-02-14  
-기준: 현재 프론트 코드(`src/*`) + 기획 문서(`PLAN_FRONTEND.md`, `docs/*`)
+최종 업데이트: 2026-02-20  
+기준: 현재 프론트 코드(`src/*`) + 로드맵(`docs/PLAN_FRONTEND.md`)
 
 이 문서는 “현재 프론트에 이미 존재하는 화면/흐름”을 기준으로, **백엔드가 제공해야 하는 API를 체크리스트 형태로 한 파일에 통합**한 것입니다.  
 백엔드 구현(또는 OpenAPI 설계) 시, 아래 항목을 “프론트에서 실제로 쓰는 필드” 중심으로 우선 충족시키면 됩니다.
+
+문서 책임:
+- API 계약/체크리스트는 이 문서에서만 관리
+- 작업 진행 상태는 `docs/TASK_BOARD.md`에서만 관리
 
 ---
 
@@ -71,8 +76,8 @@
 - `GET /matches/inbox` (받은/보낸 요청)
 - `POST /matches/:id/accept` → `roomId`를 받아 `/chat/[roomId]` 이동
 
-관련 프론트(화면은 아직 없음, `PLAN_FRONTEND.md` 단계로 예정):
-- `PLAN_FRONTEND.md`
+관련 프론트(화면은 아직 없음, `docs/PLAN_FRONTEND.md` 단계로 예정):
+- `docs/PLAN_FRONTEND.md`
 
 ### 1-5. 채팅(목록/방)
 - `GET /chats` (방 목록)
@@ -366,6 +371,6 @@
 
 ## 4) 참고 문서(이 체크리스트의 근거)
 
-- 실행 계획(최신): `PLAN_FRONTEND.md`
+- 실행 계획(최신): `docs/PLAN_FRONTEND.md`
 - Auth API 계약(정본, backend repo `docs/`): `dog-walk_backend/dog-walk_back/docs/AUTH_API.md`
 - API 응답 포맷(정본, backend repo `docs/`): `dog-walk_backend/dog-walk_back/docs/API_RESPONSE_FORMAT.md`

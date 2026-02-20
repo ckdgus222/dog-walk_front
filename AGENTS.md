@@ -46,6 +46,25 @@
 - Canonical contract docs live in the backend repo under `docs/`.
   - In this workspace: `dog-walk_backend/dog-walk_back/docs/API_RESPONSE_FORMAT.md`, `dog-walk_backend/dog-walk_back/docs/AUTH_API.md`
 
+## Docs Workflow (AI Collaboration)
+- Document index: `docs/README.md` (entry point).
+- Long-term sequence and phase goals: `docs/PLAN_FRONTEND.md`.
+- Frontend-backend API binding checklist: `docs/API_CHECKLIST_FRONTEND.md`.
+- Active execution status (single source of truth): `docs/TASK_BOARD.md`.
+- Review snapshot and pre-release checks: `docs/REVIEW_CHECKLIST_FRONTEND.md`.
+- Architecture/onboarding reference: `docs/PROJECT_STRUCTURE.md`.
+- Avoid duplicate content across docs. Keep one owner doc per topic and link from others.
+- Progress updates belong only in `docs/TASK_BOARD.md`; do not track status inside roadmap/API docs.
+
+### Required Input for AI Task Requests
+- For implementation tasks, provide these docs explicitly:
+  1) `docs/PLAN_FRONTEND.md`
+  2) `docs/API_CHECKLIST_FRONTEND.md`
+  3) `docs/TASK_BOARD.md`
+- For review/inspection tasks, also include:
+  4) `docs/REVIEW_CHECKLIST_FRONTEND.md`
+- `docs/README.md` alone is not enough; include the actual working docs above.
+
 ## PR / Docs / Config
 - Commits are short and descriptive (Korean/English mixed in history).
 - PRs: summary + verification steps + screenshots for UI changes.
