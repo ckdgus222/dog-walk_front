@@ -53,7 +53,9 @@ export const authApi = {
   refresh: () =>
     apiFetch<RefreshResponse>("/auth/refresh", {
       method: "POST",
-      headers: { "X-Refresh-Token": localStorage.getItem("refreshToken") || "" },
+      headers: {
+        "X-Refresh-Token": localStorage.getItem("refreshToken") || "",
+      },
     }),
 
   // 내 정보 조회

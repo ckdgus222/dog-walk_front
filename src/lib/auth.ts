@@ -26,11 +26,13 @@ export const removeRefreshToken = () => {
   if (typeof window === "undefined") return;
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
+
 // 전체 인증 정보 삭제
 export const clearAuth = () => {
   removeAccessToken();
   removeRefreshToken();
 };
+
 // 로그인 상태 확인
 export const isLoggedIn = () => {
   if (typeof window === "undefined") return false;
