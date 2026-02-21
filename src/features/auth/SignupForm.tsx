@@ -38,8 +38,8 @@ export const SignupForm = ({ onSubmit, isLoading, error }: SignupFormProps) => {
       photoUrl: undefined,
     },
   })
-  const updateField = (field: keyof SignupData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+  const updateField = <K extends keyof SignupData>(field: K, value: SignupData[K]) => {
+    setFormData((prev) => ({ ...prev, [field]: value } as SignupData))
   }
   const updateDog = (dog: SignupData["dog"]) => {
     setFormData((prev) => ({ ...prev, dog }))
@@ -167,6 +167,7 @@ export const SignupForm = ({ onSubmit, isLoading, error }: SignupFormProps) => {
             initialData={formData.dog}
             onChange={updateDog}
             disabled={isLoading}
+            allowPhotoUpload={false}
           />
         )}
         {/* 버튼 영역 */}

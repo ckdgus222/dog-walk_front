@@ -213,7 +213,13 @@ export const LocationHeader = () => {
   );
 };
 
-export const PageHeader = ({ title, action, backButton }: any) => {
+interface PageHeaderProps {
+  title: string;
+  action?: ReactNode;
+  backButton?: boolean;
+}
+
+export const PageHeader = ({ title, action, backButton }: PageHeaderProps) => {
   return (
     <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#F1F3F5] h-14 flex items-center justify-between px-4 lg:hidden">
       <div className="flex items-center gap-3">

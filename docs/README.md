@@ -28,12 +28,27 @@
 
 ## AI 작업 지시 시 기본 입력
 
-AI에게 작업 지시할 때는 아래 3개를 기본으로 전달합니다.
+AI에게 **구현 작업**을 지시할 때는 아래 4개를 기본으로 전달합니다.
 
 1. `docs/PLAN_FRONTEND.md`
 2. `docs/API_CHECKLIST_FRONTEND.md`
 3. `docs/TASK_BOARD.md`
+4. `AGENTS.md`
 
 검수/리뷰를 요청할 때는 아래 문서를 추가로 전달합니다.
 
-4. `docs/REVIEW_CHECKLIST_FRONTEND.md`
+5. `docs/REVIEW_CHECKLIST_FRONTEND.md`
+
+API 연동 작업(백엔드가 정본)이라면 아래 `Backend 정본(참조)` 섹션의 문서도 함께 전달합니다.
+
+## Backend 정본(참조)
+
+- 문서 인덱스: `../../dog-walk_backend/dog-walk_back/README.md`
+- API 전역 규칙(정본): `../../dog-walk_backend/dog-walk_back/docs/API_RESPONSE_FORMAT.md`
+- Auth 계약(정본): `../../dog-walk_backend/dog-walk_back/docs/AUTH_API.md`
+- Me 계약(정본): `../../dog-walk_backend/dog-walk_back/docs/ME_API.md`
+- 백엔드 계획/우선순위: `../../dog-walk_backend/dog-walk_back/PLAN_BACKEND.md`
+
+필요할 때만:
+- 구조/온보딩: `../../dog-walk_backend/dog-walk_back/docs/PROJECT_STRUCTURE.md`
+- 진행 로그: `../../dog-walk_backend/dog-walk_back/.opencode/plans/BACKEND_PROGRESS.md`

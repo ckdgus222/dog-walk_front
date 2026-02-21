@@ -6,11 +6,8 @@ import { ChatList, ChatEmptyState } from "@/features/chat/components";
 import { CHAT_ROOMS } from "@/lib/mock/chat";
 import { MessageSquare } from "lucide-react";
 
-type DemoState = "default" | "empty";
-const DEMO_STATE: DemoState = "default";
-
 const ChatPage = () => {
-  const rooms = DEMO_STATE === "empty" ? [] : CHAT_ROOMS;
+  const rooms = CHAT_ROOMS;
 
   return (
     <div className="min-h-screen lg:h-screen lg:flex">

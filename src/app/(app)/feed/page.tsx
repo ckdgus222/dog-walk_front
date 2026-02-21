@@ -6,11 +6,8 @@ import { FeedCard, FeedWidget } from "@/features/feed/components";
 import { FEED_POSTS } from "@/lib/mock/feed";
 import { Bell, ImageOff } from "lucide-react";
 
-type DemoState = "default" | "empty";
-const DEMO_STATE: DemoState = "default";
-
 const FeedPage = () => {
-  const posts = DEMO_STATE === "empty" ? [] : FEED_POSTS;
+  const posts = FEED_POSTS;
 
   return (
     <div className="bg-[#F8F9FA] min-h-full pb-20">

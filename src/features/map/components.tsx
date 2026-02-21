@@ -29,7 +29,7 @@ export const FilterChipBar = ({
   onFiltersChange,
 }: {
   filters: Filters;
-  onFiltersChange: any;
+  onFiltersChange: (next: Filters) => void;
 }) => {
   const toggleFilter = (category: keyof Filters, value: string) => {
     const current = filters[category];
@@ -39,7 +39,8 @@ export const FilterChipBar = ({
     onFiltersChange({ ...filters, [category]: updated });
   };
 
-  const renderChips = (options: readonly any[], category: keyof Filters) =>
+  type FilterOption = { value: string; label: string };
+  const renderChips = (options: readonly FilterOption[], category: keyof Filters) =>
     options.map((opt) => {
       const isActive = filters[category].includes(opt.value);
       return (
@@ -165,7 +166,11 @@ export const MapPlaceholder = ({
   markers,
   onMarkerClick,
   selectedMarkerId,
-}: any) => {
+}: {
+  markers: MapMarker[];
+  onMarkerClick: (marker: MapMarker) => void;
+  selectedMarkerId?: string | null;
+}) => {
   return (
     <div className="absolute inset-0 bg-[#E9ECEF] w-full h-full">
       {/* Map Background Pattern */}
@@ -218,7 +223,15 @@ export const MapPlaceholder = ({
 };
 
 // ============ MateDetailSheet ============
-export const MateDetailSheet = ({ marker, onClose, onRequestWalk }: any) => {
+export const MateDetailSheet = ({
+  marker,
+  onClose,
+  onRequestWalk,
+}: {
+  marker: MapMarker | null;
+  onClose: () => void;
+  onRequestWalk: () => void;
+}) => {
   if (!marker) return null;
 
   return (
@@ -262,7 +275,7 @@ export const MateDetailSheet = ({ marker, onClose, onRequestWalk }: any) => {
 
         <div className="bg-[#F8F9FA] rounded-xl p-4 mb-6 border border-[#F1F3F5]">
           <p className="text-sm text-[#495057] leading-relaxed">
-            "{marker.bio}"
+            &quot;{marker.bio}&quot;
           </p>
         </div>
 

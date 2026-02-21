@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui";
 import { apiFetchFormData } from "@/lib/api";
 import { Upload, X } from "lucide-react";
-import { useEffect, useState } from "react";
 
 const PERSONALITY_TAGS = ["활발함", "소심함", "친화적", "독립적", "순함", "경계심강함", "장난기많음", "산책좋아함"];
 
@@ -20,17 +19,14 @@ interface DogProfileFormProps {
   initialData: DogData;
   onChange: (data: DogData) => void;
   disabled?: boolean;
+  allowPhotoUpload?: boolean;
 }
 
-export const DogProfileForm = ({ initialData, onChange, disabled }: DogProfileFormProps) => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(initialData.photoUrl || null);
+export const DogProfileForm = ({ initialData, onChange, disabled, allowPhotoUpload = true }: DogProfileFormProps) => {
+  const previewUrl = initialData.photoUrl || null;
 
-  useEffect(() => {
-    setPreviewUrl(initialData.photoUrl || null);
-  }, [initialData.photoUrl]);
-
-  const updateDog = (field: keyof DogData, value: any) => {
-    onChange({ ...initialData, [field]: value });
+  const updateDog = <K extends keyof DogData>(field: K, value: DogData[K]) => {
+    onChange({ ...initialData, [field]: value } as DogData);
   };
 
   const togglePersonality = (tag: string) => {
@@ -40,6 +36,8 @@ export const DogProfileForm = ({ initialData, onChange, disabled }: DogProfileFo
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!allowPhotoUpload || disabled) return;
+
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -59,14 +57,13 @@ export const DogProfileForm = ({ initialData, onChange, disabled }: DogProfileFo
     try {
       const response = await apiFetchFormData<{ url: string }>("media/upload", formData);
       updateDog("photoUrl", response.url);
-      setPreviewUrl(response.url);
     } catch (error) {
       console.error("사진 업로드에 실패했습니다.", error);
     }
   };
   const removePhoto = () => {
+    if (!allowPhotoUpload || disabled) return;
     updateDog("photoUrl", undefined);
-    setPreviewUrl(null);
   };
 
   const currentYear = new Date().getFullYear();
@@ -180,16 +177,19 @@ export const DogProfileForm = ({ initialData, onChange, disabled }: DogProfileFo
       {/* 사진 업로드 */}
       <div>
         <label className="block text-sm font-medium text-[#495057] mb-2">강아지 사진</label>
+        {!allowPhotoUpload && (
+          <p className="text-xs text-[#868E96] mb-2">회원가입 후 마이페이지에서 사진을 업로드할 수 있어요. (기본 이미지 사용)</p>
+        )}
         {previewUrl ? (
           <div className="relative w-full h-40 rounded-xl overflow-hidden bg-[#F1F3F5]">
             <img src={previewUrl} alt="강아지 사진" className="w-full h-full object-cover" />
-            {!disabled && (
+            {!disabled && allowPhotoUpload && (
               <button type="button" onClick={removePhoto} className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100">
                 <X size={16} className="text-[#495057]" />
               </button>
             )}
           </div>
-        ) : (
+        ) : allowPhotoUpload ? (
           <label
             className={`flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-[#DEE2E6] bg-[#F8F9FA] cursor-pointer hover:bg-[#F1F3F5] transition-colors ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
@@ -198,6 +198,12 @@ export const DogProfileForm = ({ initialData, onChange, disabled }: DogProfileFo
             <span className="text-xs text-[#ADB5BD] mt-1">JPG, PNG, WEBP (최대 5MB)</span>
             <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoUpload} disabled={disabled} className="hidden" />
           </label>
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-[#DEE2E6] bg-[#F8F9FA] opacity-70">
+            <Upload size={24} className="text-[#ADB5BD] mb-2" />
+            <span className="text-sm text-[#868E96]">회원가입 후 업로드 가능</span>
+            <span className="text-xs text-[#ADB5BD] mt-1">마이페이지에서 변경할 수 있어요</span>
+          </div>
         )}
       </div>
     </div>

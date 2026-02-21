@@ -56,7 +56,9 @@
 
 ### 1-2. 회원가입(2-step) → (선택) 강아지 사진 업로드
 - 현재 UI는 회원가입 폼에서 `dog` 프로필까지 입력합니다.
-- 사진 업로드는 회원가입 중 `POST /media/upload`를 호출합니다(토큰 없이 호출될 수 있음).
+- 강아지 사진 업로드는 **회원가입 이후(로그인 상태)**에만 가능합니다.
+  - 정책: `POST /media/upload`는 Bearer 토큰이 필요한 Protected API로 고정
+  - 회원가입 단계에서는 기본 이미지를 사용하고, 가입 후 마이페이지에서 사진을 업로드/수정합니다.
 
 관련 프론트:
 - `src/app/(auth)/signup/page.tsx`
@@ -131,11 +133,10 @@
     ```
   - 사용처: `src/lib/api/auth.ts`, `src/features/auth/hooks/useLoginMutation.ts`
 
-- [ ] `POST /auth/signup` (Public)  ✅ *계약 확정 필요*
-  - 옵션 A(1-step): 가입 요청에 `dog` 포함 허용 → 가입과 동시에 dog 생성
-  - 옵션 B(2-step): `/auth/signup`은 유저만 생성 → 성공 후 `POST /me/dogs`로 dog 생성
-  - 현재 프론트 UI 입력값(2-step 폼):
-    - `{ email, password, nickname, dog: { name, breed, birthYear, gender, personality[], photoUrl? } }`
+- [ ] `POST /auth/signup` (Public) (고정: 1-step, user+dog 트랜잭션)
+  - Request(JSON): `{ email, password, nickname, dog: { name, breed, birthYear, gender, personality[], photoUrl? } }`
+  - Note:
+    - 사진 업로드는 가입 후에만 가능(업로드 API는 Bearer 필요) → 가입 시점에는 기본 이미지 사용
   - 사용처: `src/app/(auth)/signup/page.tsx`, `src/features/auth/SignupForm.tsx`, `src/features/auth/hooks/useSignupMutation.ts`
 
 - [ ] `POST /auth/refresh` (Public + RefreshHeader)
@@ -168,16 +169,17 @@
 
 ### 2-2. Media Upload
 
-- [ ] `POST /media/upload` (multipart/form-data)
+- [ ] `POST /media/upload` (multipart/form-data, Bearer)
   - Request(FormData): `file=<binary>`
   - Response(JSON): 프론트는 현재 최소 `{ url }`을 기대
     ```json
     { "url": "https://..." }
     ```
-  - 사용처: `src/features/auth/DogProfileForm.tsx`
-  - 결정 포인트(중요):
-    - 회원가입 전 업로드가 가능해야 UI가 그대로 동작합니다(토큰이 없을 수 있음).
-    - 업로드에 인증을 걸고 싶다면, 프론트 플로우를 “회원가입 완료 후 업로드/수정”으로 바꾸는 게 안전합니다.
+  - 사용처(예정):
+    - 마이페이지 강아지 사진 수정(가입 후)
+    - 피드 작성 이미지(업로드 후 `/posts` 작성)
+  - 정책:
+    - 회원가입 단계에서는 업로드하지 않고 기본 이미지를 사용합니다.
 
 ---
 
@@ -359,13 +361,14 @@
 
 ## 3) “계약 확정”이 필요한 항목(프론트/백엔드가 같이 결정해야 함)
 
-- [ ] 회원가입: 1-step(`POST /auth/signup`에 dog 포함) vs 2-step(가입 후 `POST /me/dogs`)
-  - 현재 UI는 2-step 입력을 이미 받음(`src/features/auth/SignupForm.tsx`)
+- [x] 회원가입: 1-step(`POST /auth/signup`에 dog 포함, user+dog 트랜잭션)
+  - UI는 Step 1/2로 입력을 받지만, 가입은 `POST /auth/signup` 1회 호출로 처리합니다.
 
-- [ ] Refresh: `POST /auth/refresh`로 고정(권장). 프론트는 `attemptRefresh()`에서 POST로 호출합니다.
+- [x] Refresh: `POST /auth/refresh`로 고정. 프론트는 `attemptRefresh()`에서 POST로 호출합니다.
 
-- [ ] 업로드 인증: `POST /media/upload`가 회원가입 전에도 호출될 수 있음(토큰 없음)
-  - 백엔드에서 Public로 열지, 프론트 플로우를 바꿀지 결정 필요
+- [x] 업로드 인증: `POST /media/upload`는 Protected(Bearer)
+  - 회원가입 단계에서는 업로드하지 않고 기본 이미지를 사용합니다.
+  - 가입 후 마이페이지에서 업로드/수정 플로우로 연결합니다.
 
 ---
 

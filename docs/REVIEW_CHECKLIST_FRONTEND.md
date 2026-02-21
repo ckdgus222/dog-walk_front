@@ -13,8 +13,8 @@
 ## 구현 현황 스냅샷 (필수 API 27개 기준)
 
 - 필수 API: `27`
-- `✅ 구현완료`: `4`
-- `🟨 부분구현`: `1`
+- `✅ 구현완료`: `3`
+- `🟨 부분구현`: `2`
 - `⬜ 미구현`: `22`
 - 선택 API(3개): 전부 미구현
 
@@ -33,8 +33,8 @@
 
 ### 2-2. Media Upload
 
-- `✅ POST /media/upload`  
-  근거: `src/features/auth/DogProfileForm.tsx:60`
+- `🟨 POST /media/upload` (구현은 있으나 현재 가입 플로우에서는 비활성)  
+  근거: `src/features/auth/DogProfileForm.tsx:58`, `src/features/auth/SignupForm.tsx:170`
 
 ### 2-3 ~ 2-8. 나머지 도메인
 
@@ -47,15 +47,15 @@
 
 ## 계약 확정 항목(문서 3번 섹션 기준)
 
-- `⬜` 회원가입 1-step vs 2-step 최종 고정
+- `✅` 회원가입 1-step 최종 고정(user+dog 트랜잭션)
 - `✅` Refresh `POST /auth/refresh` 고정
-- `⬜` 업로드 인증 정책(Public/Protected) 고정
+- `✅` 업로드 인증 정책 Protected(Bearer) 고정
 
 ## 실제 검수 체크리스트 (릴리즈 전)
 
 - [ ] 로그인 성공 시 토큰 저장 후 `/map` 이동 확인
 - [ ] 보호 API 401 발생 시 refresh 후 복구/실패 시 `/login` 이동 확인
-- [ ] 회원가입 플로우에서 강아지 이미지 업로드 성공/실패 UX 확인
+- [ ] 회원가입 후(마이페이지) 강아지 이미지 업로드 성공/실패 UX 확인
 - [ ] API 오류 메시지가 UI에서 사용자에게 보이는지 확인
 - [ ] mock 화면(Map/Feed/Chat/MyPage)과 API 연동 화면 범위가 일치하는지 확인
 

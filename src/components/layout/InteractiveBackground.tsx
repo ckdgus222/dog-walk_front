@@ -63,7 +63,15 @@ export const InteractiveBackground = () => {
   );
 };
 
-const FloatingItem = ({ emoji, top, left, speed, mousePos }: any) => {
+type FloatingItemProps = {
+  emoji: string;
+  top: string;
+  left: string;
+  speed: number;
+  mousePos: { x: number; y: number };
+};
+
+const FloatingItem = ({ emoji, top, left, speed, mousePos }: FloatingItemProps) => {
   return (
     <div
       className="absolute text-6xl select-none opacity-60 transition-transform duration-500 will-change-transform"
