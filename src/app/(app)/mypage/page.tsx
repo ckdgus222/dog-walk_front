@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { PageHeader } from "@/components/layout";
-import {
-  MyPageErrorState,
-  MyPageLoadingState,
-  MyPageView,
-} from "@/features/mypage/MyPageView";
+import { MyPageErrorState, MyPageLoadingState, MyPageView } from "@/features/mypage/MyPageView";
 import { useMyPageQuery } from "@/features/mypage/hooks/useMyPageQuery";
 import { Settings } from "lucide-react";
 
@@ -15,7 +11,7 @@ const MyPage = () => {
   const { data, isPending, isError, refetch } = useMyPageQuery();
 
   return (
-    <div className="bg-[#F8F9FA] min-h-full pb-20">
+    <div className="bg-[#F8F9FA] min-h-full">
       <PageHeader
         title="나의 산책"
         action={
@@ -35,13 +31,7 @@ const MyPage = () => {
         />
       )}
 
-      {!isPending && data && (
-        <MyPageView
-          data={data}
-          showWalkHistory={showWalkHistory}
-          onToggleWalkHistory={() => setShowWalkHistory((prev) => !prev)}
-        />
-      )}
+      {!isPending && data && <MyPageView data={data} showWalkHistory={showWalkHistory} onToggleWalkHistory={() => setShowWalkHistory((prev) => !prev)} />}
     </div>
   );
 };

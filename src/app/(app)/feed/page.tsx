@@ -10,7 +10,7 @@ const FeedPage = () => {
   const posts = FEED_POSTS;
 
   return (
-    <div className="bg-[#F8F9FA] min-h-full pb-20">
+    <div className="bg-[#F8F9FA] min-h-full">
       <PageHeader
         title="우리 동네 이야기"
         action={
@@ -24,11 +24,7 @@ const FeedPage = () => {
         {/* Feed List */}
         <div className="flex-1 max-w-xl">
           {posts.length === 0 ? (
-            <EmptyState
-              icon={<ImageOff className="w-12 h-12" />}
-              title="아직 게시물이 없어요"
-              description="첫 번째 산책 이야기를 공유해보세요!"
-            />
+            <EmptyState icon={<ImageOff className="w-12 h-12" />} title="아직 게시물이 없어요" description="첫 번째 산책 이야기를 공유해보세요!" />
           ) : (
             posts.map((post) => <FeedCard key={post.id} post={post} />)
           )}

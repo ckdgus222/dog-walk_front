@@ -2,22 +2,10 @@
 
 import { useState } from "react";
 import { LocationHeader } from "@/components/layout";
-import { List, Map as MapIcon, Plus } from "lucide-react";
-import {
-  FilterChipBar,
-  MateListCard,
-  MapPlaceholder,
-  MateDetailSheet,
-} from "@/features/map/components";
-import {
-  MAP_MARKERS,
-  Filters,
-  DOG_SIZES,
-  WALK_STYLES,
-  PREFERRED_TIMES,
-} from "@/lib/mock/map";
+import { List, Map as MapIcon } from "lucide-react";
+import { FilterChipBar, MateListCard, MapPlaceholder, MateDetailSheet } from "@/features/map/components";
+import { MAP_MARKERS, Filters } from "@/lib/mock/map";
 import { MapMarker } from "@/lib/mock/map";
-import { Button } from "@/components/ui";
 
 const MapPage = () => {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
@@ -30,8 +18,7 @@ const MapPage = () => {
 
   // Filter Logic
   const filteredMarkers = MAP_MARKERS.filter((marker) => {
-    if (filters.dogSizes.length && !filters.dogSizes.includes(marker.dogSize))
-      return false;
+    if (filters.dogSizes.length && !filters.dogSizes.includes(marker.dogSize)) return false;
     // ... basic logic (mock)
     return true;
   });
@@ -53,22 +40,17 @@ const MapPage = () => {
              ${viewMode === "map" ? "hidden lg:block" : "block"}
          `}
         >
-          <div className="p-4 space-y-4 pb-24 lg:pb-4">
+          <div className="p-4 space-y-4 pb-[calc(24px+env(safe-area-inset-bottom))] lg:pb-4">
             {/* List Header */}
             <div className="flex items-center justify-between mb-2 px-1">
               <h2 className="font-bold text-[#212529]">
-                내 주변 산책 메이트{" "}
-                <span className="text-[#FF8A3D]">{filteredMarkers.length}</span>
+                내 주변 산책 메이트 <span className="text-[#FF8A3D]">{filteredMarkers.length}</span>
               </h2>
               <span className="text-xs text-[#868E96]">역삼 1동 기준</span>
             </div>
 
             {filteredMarkers.map((marker) => (
-              <MateListCard
-                key={marker.id}
-                data={marker}
-                onClick={() => setSelectedMarker(marker)}
-              />
+              <MateListCard key={marker.id} data={marker} onClick={() => setSelectedMarker(marker)} />
             ))}
           </div>
         </div>
@@ -80,11 +62,7 @@ const MapPage = () => {
              ${viewMode === "list" ? "hidden lg:block" : "block"}
          `}
         >
-          <MapPlaceholder
-            markers={filteredMarkers}
-            onMarkerClick={setSelectedMarker}
-            selectedMarkerId={selectedMarker?.id}
-          />
+          <MapPlaceholder markers={filteredMarkers} onMarkerClick={setSelectedMarker} selectedMarkerId={selectedMarker?.id} />
 
           {/* FAB (Mobile Only) */}
           <div className="absolute bottom-6 right-4 z-30 lg:hidden">

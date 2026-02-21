@@ -167,3 +167,4 @@ export const myPageApi = {
   // Promise 형태를 유지해두면 나중에 fetch로 바꿔도 호출부 변경이 거의 없다.
   getMyPage: async (): Promise<MyPageData> => buildMyPageData(),
 };
+

@@ -3,15 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Map,
-  Newspaper,
-  MessageCircle,
-  User,
-  Bell,
-  Search,
-  Dog,
-} from "lucide-react";
+import { Map, Newspaper, MessageCircle, User, Bell, Search, Dog } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/routes";
 import { InteractiveBackground } from "./InteractiveBackground";
@@ -49,9 +41,7 @@ export const AppShell = ({ children }: AppShellProps) => {
           {/* Main Content Area */}
           <main className="flex-1 w-full relative overflow-hidden flex flex-col">
             {/* Scrollable Content Wrapper */}
-            <div className="flex-1 overflow-y-auto no-scrollbar pb-[70px] lg:pb-0 scroll-smooth">
-              {children}
-            </div>
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-[calc(70px+env(safe-area-inset-bottom))] lg:pb-0 scroll-smooth">{children}</div>
           </main>
 
           {/* Mobile Bottom Navigation (Visible only on mobile) */}
@@ -90,9 +80,7 @@ const GlassTopNav = () => {
               href={item.href}
               className={cn(
                 "px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300",
-                isActive
-                  ? "bg-[#2D3748] text-white shadow-md transform scale-105"
-                  : "text-[#718096] hover:bg-white/60 hover:text-[#2D3748]",
+                isActive ? "bg-[#2D3748] text-white shadow-md transform scale-105" : "text-[#718096] hover:bg-white/60 hover:text-[#2D3748]",
               )}
             >
               {item.label}
@@ -117,10 +105,7 @@ const GlassTopNav = () => {
         </button>
         <div className="h-8 w-px bg-gray-200 mx-1"></div>
         <button className="flex items-center gap-3 pl-1 pr-2 py-1 hover:bg-white/50 rounded-full transition-all">
-          <Avatar
-            size="sm"
-            className="w-9 h-9 border-2 border-white shadow-sm"
-          />
+          <Avatar size="sm" className="w-9 h-9 border-2 border-white shadow-sm" />
           <div className="text-left hidden xl:block">
             <p className="text-xs font-bold text-[#2D3748]">Golden Retriever</p>
             <p className="text-[10px] text-[#718096]">Premium Member</p>
@@ -157,24 +142,9 @@ const MobileNav = () => {
               isActive ? "text-[#FF8A3D]" : "text-[#A0AEC0]",
             )}
           >
-            {isActive && (
-              <span className="absolute -top-0.5 w-8 h-1 bg-[#FF8A3D] rounded-full shadow-[0_2px_8px_rgba(255,138,61,0.4)]" />
-            )}
-            <Icon
-              className={cn(
-                "w-6 h-6 transition-all",
-                isActive && "transform -translate-y-0.5",
-              )}
-              strokeWidth={isActive ? 2.5 : 2}
-            />
-            <span
-              className={cn(
-                "text-[10px] transition-all",
-                isActive ? "font-bold opacity-100" : "font-medium opacity-80",
-              )}
-            >
-              {item.label}
-            </span>
+            {isActive && <span className="absolute -top-0.5 w-8 h-1 bg-[#FF8A3D] rounded-full shadow-[0_2px_8px_rgba(255,138,61,0.4)]" />}
+            <Icon className={cn("w-6 h-6 transition-all", isActive && "transform -translate-y-0.5")} strokeWidth={isActive ? 2.5 : 2} />
+            <span className={cn("text-[10px] transition-all", isActive ? "font-bold opacity-100" : "font-medium opacity-80")}>{item.label}</span>
           </Link>
         );
       })}
@@ -224,10 +194,7 @@ export const PageHeader = ({ title, action, backButton }: PageHeaderProps) => {
     <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#F1F3F5] h-14 flex items-center justify-between px-4 lg:hidden">
       <div className="flex items-center gap-3">
         {backButton && (
-          <button
-            onClick={() => window.history.back()}
-            className="text-[#2D3748] p-1 -ml-1"
-          >
+          <button onClick={() => window.history.back()} className="text-[#2D3748] p-1 -ml-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
