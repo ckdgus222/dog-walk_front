@@ -1,6 +1,8 @@
 // 라우트 상수
 export const ROUTES = {
   HOME: "/",
+  LOGIN: "/login",
+  SIGNUP: "/signup",
   MAP: "/map",
   FEED: "/feed",
   CHAT: "/chat",

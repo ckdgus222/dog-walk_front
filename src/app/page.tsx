@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/routes";
 
-export default function Home() {
+const Home = () => {
   redirect(ROUTES.MAP);
-}
+};
+
+export default Home;

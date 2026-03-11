@@ -19,7 +19,7 @@ import {
 import { MapMarker } from "@/lib/mock/map";
 import { Button } from "@/components/ui";
 
-export default function MapPage() {
+const MapPage = () => {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
   const [filters, setFilters] = useState<Filters>({
@@ -119,4 +119,6 @@ export default function MapPage() {
       />
     </div>
   );
-}
+};
+
+export default MapPage;

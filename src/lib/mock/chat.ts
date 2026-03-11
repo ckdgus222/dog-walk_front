@@ -165,10 +165,10 @@ export const CHAT_MESSAGES: Record<string, ChatMessage[]> = {
   ],
 };
 
-export function getChatRoom(roomId: string): ChatRoom | undefined {
+export const getChatRoom = (roomId: string): ChatRoom | undefined => {
   return CHAT_ROOMS.find((room) => room.id === roomId);
-}
+};
 
-export function getChatMessages(roomId: string): ChatMessage[] {
+export const getChatMessages = (roomId: string): ChatMessage[] => {
   return CHAT_MESSAGES[roomId] || [];
-}
+};

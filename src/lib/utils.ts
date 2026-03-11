@@ -1,26 +1,24 @@
 // 유틸리티 함수
-export function cn(
+export const cn = (
   ...classes: (string | boolean | undefined | null)[]
-): string {
-  return classes.filter(Boolean).join(" ");
-}
+): string => classes.filter(Boolean).join(" ");
 
-export function formatDate(date: Date): string {
+export const formatDate = (date: Date): string => {
   return date.toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-}
+};
 
-export function formatTime(date: Date): string {
+export const formatTime = (date: Date): string => {
   return date.toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
+};
 
-export function formatRelativeTime(date: Date): string {
+export const formatRelativeTime = (date: Date): string => {
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / (1000 * 60));
@@ -32,4 +30,4 @@ export function formatRelativeTime(date: Date): string {
   if (hours < 24) return `${hours}시간 전`;
   if (days < 7) return `${days}일 전`;
   return formatDate(date);
-}
+};

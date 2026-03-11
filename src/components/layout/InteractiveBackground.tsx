@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export function InteractiveBackground() {
+export const InteractiveBackground = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -61,9 +61,9 @@ export function InteractiveBackground() {
       />
     </div>
   );
-}
+};
 
-function FloatingItem({ emoji, top, left, speed, mousePos }: any) {
+const FloatingItem = ({ emoji, top, left, speed, mousePos }: any) => {
   return (
     <div
       className="absolute text-6xl select-none opacity-60 transition-transform duration-500 will-change-transform"
@@ -76,4 +76,4 @@ function FloatingItem({ emoji, top, left, speed, mousePos }: any) {
       {emoji}
     </div>
   );
-}
+};

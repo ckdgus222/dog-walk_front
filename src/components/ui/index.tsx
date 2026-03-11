@@ -12,14 +12,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
-export function Button({
+export const Button = ({
   variant = "primary",
   size = "md",
   className,
   children,
   fullWidth,
   ...props
-}: ButtonProps) {
+}: ButtonProps) => {
   const baseStyles =
     "inline-flex items-center justify-center font-bold rounded-2xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
 
@@ -51,7 +51,7 @@ export function Button({
       {children}
     </button>
   );
-}
+};
 
 // ============ Card ============
 /* Village Mate: Clean White Card */
@@ -61,7 +61,7 @@ interface CardProps {
   onClick?: () => void;
 }
 
-export function Card({ className, children, onClick }: CardProps) {
+export const Card = ({ className, children, onClick }: CardProps) => {
   return (
     <div
       onClick={onClick}
@@ -74,19 +74,19 @@ export function Card({ className, children, onClick }: CardProps) {
       {children}
     </div>
   );
-}
+};
 
-export function CardHeader({ className, children }: CardProps) {
+export const CardHeader = ({ className, children }: CardProps) => {
   return (
     <div className={cn("px-5 py-4 border-b border-[#F1F3F5]", className)}>
       {children}
     </div>
   );
-}
+};
 
-export function CardContent({ className, children }: CardProps) {
+export const CardContent = ({ className, children }: CardProps) => {
   return <div className={cn("p-5", className)}>{children}</div>;
-}
+};
 
 // ============ Chips / Badge ============
 /* Village Mate: Soft Tags */
@@ -96,11 +96,11 @@ interface BadgeProps {
   children: ReactNode;
 }
 
-export function Badge({
+export const Badge = ({
   variant = "default",
   className,
   children,
-}: BadgeProps) {
+}: BadgeProps) => {
   const variants = {
     default: "bg-[#F1F3F5] text-[#495057]",
     secondary: "bg-[#F8F9FA] text-[#868E96]",
@@ -119,7 +119,7 @@ export function Badge({
       {children}
     </span>
   );
-}
+};
 
 // ============ Input ============
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -127,12 +127,12 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   fullWidth?: boolean;
 }
 
-export function Input({
+export const Input = ({
   leftIcon,
   className,
   fullWidth = true,
   ...props
-}: InputProps) {
+}: InputProps) => {
   return (
     <div className={cn("relative", fullWidth && "w-full")}>
       {leftIcon && (
@@ -151,7 +151,7 @@ export function Input({
       />
     </div>
   );
-}
+};
 
 // ============ Avatar ============
 interface AvatarProps {
@@ -161,7 +161,12 @@ interface AvatarProps {
   className?: string;
 }
 
-export function Avatar({ src, alt = "", size = "md", className }: AvatarProps) {
+export const Avatar = ({
+  src,
+  alt = "",
+  size = "md",
+  className,
+}: AvatarProps) => {
   const sizes = {
     sm: "w-8 h-8",
     md: "w-10 h-10",
@@ -184,10 +189,10 @@ export function Avatar({ src, alt = "", size = "md", className }: AvatarProps) {
       )}
     </div>
   );
-}
+};
 
 // ============ Panel ============
-export function Panel({ title, rightSlot, className, children }: any) {
+export const Panel = ({ title, rightSlot, className, children }: any) => {
   return (
     <div
       className={cn(
@@ -202,10 +207,10 @@ export function Panel({ title, rightSlot, className, children }: any) {
       <div className="p-0">{children}</div>
     </div>
   );
-}
+};
 
 // ============ EmptyState ============
-export function EmptyState({ icon, title, description, action }: any) {
+export const EmptyState = ({ icon, title, description, action }: any) => {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
       <div className="text-[#DEE2E6] mb-3 text-4xl">{icon}</div>
@@ -216,11 +221,11 @@ export function EmptyState({ icon, title, description, action }: any) {
       {action}
     </div>
   );
-}
+};
 
 // ============ Skeleton ============
-export function Skeleton({ className }: any) {
+export const Skeleton = ({ className }: any) => {
   return (
     <div className={cn("animate-pulse bg-[#F1F3F5] rounded-lg", className)} />
   );
-}
+};
