@@ -1,139 +1,330 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { PageHeader } from "@/components/layout";
-import { Card, Avatar, Badge, Button } from "@/components/ui";
+import { Avatar, Badge, Button, Card } from "@/components/ui";
 import { CURRENT_USER, WALK_HISTORY } from "@/lib/mock/user";
 import { formatDate } from "@/lib/utils";
-import { Settings, ChevronRight, Award, Smile } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronRight,
+  Clock3,
+  Dog,
+  Footprints,
+  Heart,
+  MapPin,
+  Settings,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
+
+const DOG_SIZE_LABELS = {
+  small: "소형견",
+  medium: "중형견",
+  large: "대형견",
+} as const;
+
+const COMPLIMENTS = [
+  { label: "시간 약속을 잘 지켜요", count: 12 },
+  { label: "강아지가 매너 있어요", count: 8 },
+  { label: "산책이 편안하고 즐거워요", count: 5 },
+];
+
+const MENU_ITEMS = [
+  "산책 기록 전체보기",
+  "관심 메이트 관리",
+  "알림 및 동네 설정",
+];
 
 const MyPage = () => {
   const user = CURRENT_USER;
+  const totalDistance = WALK_HISTORY.reduce((sum, walk) => sum + walk.distance, 0);
 
   return (
-    <div className="bg-[#F8F9FA] min-h-full pb-20">
+    <div className="min-h-full bg-[var(--color-bg)]">
       <PageHeader
-        title="나의 산책"
+        title="마이페이지"
         action={
-          <button className="p-2 text-[#212529]">
-            <Settings className="w-5 h-5" />
+          <button className="rounded-xl p-2 text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-subtle)]">
+            <Settings className="h-5 w-5" />
           </button>
         }
       />
 
-      {/* 1. Profile Section (Business Card Style) */}
-      <div className="px-4 py-6 bg-white border-b border-[#F1F3F5] mb-2">
-        <div className="flex items-center gap-4 mb-4">
-          <Avatar size="xl" className="w-16 h-16 border border-[#E9ECEF]" />
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-[#212529] mb-1">
-              {user.name}
-            </h2>
-            <div className="flex items-center text-xs text-[#868E96]">
-              <span className="truncate">
-                {user.dogName} ({user.dogBreed})
-              </span>
-              <span className="mx-1">·</span>
-              <span className="truncate">역삼 1동</span>
-            </div>
+      <div className="mx-auto max-w-4xl px-4 py-5 md:px-6 md:py-6">
+        <div className="mb-6 hidden items-start justify-between md:flex">
+          <div>
+            <p className="text-xs font-semibold text-[var(--color-primary)]">
+              TRUST PROFILE
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-[-0.02em] text-[var(--color-text-primary)]">
+              나의 산책 프로필
+            </h1>
+            <p className="mt-2 text-sm text-[var(--color-text-tertiary)]">
+              매너온도, 산책 기록, 반려견 정보까지 한 번에 관리합니다.
+            </p>
           </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="bg-[#F1F3F5] h-8 px-3 rounded-lg text-xs font-bold"
-          >
-            프로필 수정
+
+          <Button variant="outline">
+            <Settings className="h-4 w-4" />
+            프로필 설정
           </Button>
         </div>
 
-        {/* Manner Temp Bar */}
-        <div className="bg-[#F8F9FA] rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-[#495057] flex items-center gap-1">
-              <Smile className="w-3.5 h-3.5 text-[#FF8A3D]" />
-              매너온도
-            </span>
-            <span className="text-sm font-bold text-[#FF8A3D]">
-              {user.mannerScore}°C
-            </span>
-          </div>
-          <div className="w-full bg-[#DEE2E6] rounded-full h-2 overflow-hidden mb-2">
-            <div className="bg-[#FF8A3D] h-full rounded-full w-[36.5%]" />
-          </div>
-          <p className="text-[11px] text-[#ADB5BD] text-right">
-            첫 온도 36.5°C에서 시작해요
-          </p>
-        </div>
-      </div>
+        <Card className="mb-5 overflow-hidden">
+          <div className="p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div className="relative shrink-0">
+                <Avatar
+                  alt={user.name}
+                  size="xl"
+                  className="h-[84px] w-[84px] border-[var(--color-border-light)]"
+                />
+                <div className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--color-success)] text-white">
+                  <ShieldCheck className="h-[18px] w-[18px]" />
+                </div>
+              </div>
 
-      {/* 2. Walk Stats (Simple Grid) */}
-      <div className="px-4 py-6 bg-white border-y border-[#F1F3F5] mb-2">
-        <h3 className="text-sm font-bold text-[#212529] mb-4">
-          이번 달 산책 활동
-        </h3>
-        <div className="flex divide-x divide-[#F1F3F5]">
-          <div className="flex-1 text-center">
-            <p className="text-lg font-bold text-[#212529]">
-              {user.totalWalks}
-            </p>
-            <p className="text-[11px] text-[#868E96] mt-1">산책 횟수</p>
-          </div>
-          <div className="flex-1 text-center">
-            <p className="text-lg font-bold text-[#212529]">
-              {user.totalMates}
-            </p>
-            <p className="text-[11px] text-[#868E96] mt-1">만난 메이트</p>
-          </div>
-          <div className="flex-1 text-center">
-            <p className="text-lg font-bold text-[#212529]">12.5km</p>
-            <p className="text-[11px] text-[#868E96] mt-1">산책 거리</p>
-          </div>
-        </div>
-      </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
+                    {user.name}
+                  </h2>
+                  <Badge className="bg-[var(--color-primary-lighter)] text-[var(--color-primary-dark)]">
+                    매너온도 {user.mannerScore}°C
+                  </Badge>
+                </div>
 
-      {/* 3. Recent History Menu Style */}
-      <div className="bg-white border-y border-[#F1F3F5]">
-        <div className="px-4 py-3 border-b border-[#F1F3F5] flex justify-between items-center bg-[#F8F9FA]/50">
-          <h3 className="text-xs font-bold text-[#495057]">받은 매너 칭찬</h3>
-        </div>
-        <div className="p-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="text-base">⏰</span>
-            <span className="text-sm text-[#495057]">
-              시간 약속을 잘 지켜요
-            </span>
-            <span className="ml-auto text-xs font-bold text-[#FF8A3D] bg-[#FFF4E6] px-2 py-0.5 rounded-full">
-              12
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-base">🐕</span>
-            <span className="text-sm text-[#495057]">강아지가 매너 있어요</span>
-            <span className="ml-auto text-xs font-bold text-[#FF8A3D] bg-[#FFF4E6] px-2 py-0.5 rounded-full">
-              8
-            </span>
-          </div>
-        </div>
-      </div>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                  {user.bio}
+                </p>
 
-      {/* 4. Menu Links */}
-      <div className="mt-2 bg-white border-y border-[#F1F3F5] divide-y divide-[#F1F3F5]">
-        <button className="w-full px-4 py-4 flex items-center justify-between text-left hover:bg-[#F8F9FA]">
-          <span className="text-sm font-medium text-[#212529]">
-            산책 기록 전체보기
-          </span>
-          <ChevronRight className="w-4 h-4 text-[#ADB5BD]" />
-        </button>
-        <button className="w-full px-4 py-4 flex items-center justify-between text-left hover:bg-[#F8F9FA]">
-          <span className="text-sm font-medium text-[#212529]">관심 목록</span>
-          <ChevronRight className="w-4 h-4 text-[#ADB5BD]" />
-        </button>
-        <button className="w-full px-4 py-4 flex items-center justify-between text-left hover:bg-[#F8F9FA]">
-          <span className="text-sm font-medium text-[#212529]">
-            동네 생활 설정
-          </span>
-          <ChevronRight className="w-4 h-4 text-[#ADB5BD]" />
-        </button>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Badge>{user.dogName}</Badge>
+                  <Badge variant="orange">{user.dogBreed}</Badge>
+                  <Badge variant="secondary">
+                    {DOG_SIZE_LABELS[user.dogSize]}
+                  </Badge>
+                </div>
+              </div>
+
+              <Button variant="outline" className="sm:shrink-0">
+                프로필 수정
+              </Button>
+            </div>
+
+            <div className="mt-5 rounded-[20px] border border-[rgba(52,168,83,0.16)] bg-[var(--color-success-light)] p-4">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-success)]" />
+                <div>
+                  <p className="text-sm font-semibold text-[var(--color-success)]">
+                    신뢰할 수 있는 산책 메이트
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+                    총 산책 {user.totalWalks}회, 만난 메이트 {user.totalMates}명,
+                    받은 칭찬 {COMPLIMENTS.reduce((sum, item) => sum + item.count, 0)}건
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <MetricCard
+            icon={<Footprints className="h-[18px] w-[18px]" />}
+            label="총 산책 횟수"
+            value={`${user.totalWalks}회`}
+          />
+          <MetricCard
+            icon={<Star className="h-[18px] w-[18px]" />}
+            label="만난 메이트"
+            value={`${user.totalMates}명`}
+          />
+          <MetricCard
+            icon={<MapPin className="h-[18px] w-[18px]" />}
+            label="누적 산책 거리"
+            value={`${totalDistance.toFixed(1)}km`}
+          />
+          <MetricCard
+            icon={<Heart className="h-[18px] w-[18px]" />}
+            label="받은 칭찬"
+            value={`${COMPLIMENTS.reduce((sum, item) => sum + item.count, 0)}건`}
+          />
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+          <Card className="p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <Dog className="h-[18px] w-[18px] text-[var(--color-primary)]" />
+              <h3 className="text-base font-bold text-[var(--color-text-primary)]">
+                반려견 정보
+              </h3>
+            </div>
+
+            <div className="rounded-[20px] bg-[var(--color-bg-subtle)] p-4">
+              <div className="flex items-start gap-4">
+                <Avatar
+                  alt={user.dogName}
+                  size="xl"
+                  className="h-[72px] w-[72px] border-[var(--color-border-light)]"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-lg font-bold text-[var(--color-text-primary)]">
+                    {user.dogName}
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+                    {user.dogBreed} · {DOG_SIZE_LABELS[user.dogSize]}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Badge>{user.dogAge}살</Badge>
+                    <Badge variant="orange">산책 경험 풍부</Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <Clock3 className="h-[18px] w-[18px] text-[var(--color-primary)]" />
+              <h3 className="text-base font-bold text-[var(--color-text-primary)]">
+                산책 선호 정보
+              </h3>
+            </div>
+
+            <div className="space-y-3">
+              <PreferenceCard
+                label="선호 시간대"
+                value="아침 시간 산책 선호"
+                icon={<CalendarDays className="h-4 w-4" />}
+              />
+              <PreferenceCard
+                label="주요 활동 지역"
+                value="한강공원과 동네 산책로"
+                icon={<MapPin className="h-4 w-4" />}
+              />
+              <PreferenceCard
+                label="메이트 성향"
+                value="차분하고 책임감 있는 산책 메이트"
+                icon={<Heart className="h-4 w-4" />}
+              />
+            </div>
+          </Card>
+        </div>
+
+        <Card className="mt-5 p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <Heart className="h-[18px] w-[18px] text-[var(--color-primary)]" />
+            <h3 className="text-base font-bold text-[var(--color-text-primary)]">
+              받은 칭찬
+            </h3>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {COMPLIMENTS.map((compliment) => (
+              <Badge
+                key={compliment.label}
+                className="bg-[var(--color-warning-light)] text-[var(--color-text-secondary)]"
+              >
+                {compliment.label} · {compliment.count}
+              </Badge>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="mt-5 p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <CalendarDays className="h-[18px] w-[18px] text-[var(--color-primary)]" />
+            <h3 className="text-base font-bold text-[var(--color-text-primary)]">
+              최근 산책 기록
+            </h3>
+          </div>
+
+          <div className="space-y-3">
+            {WALK_HISTORY.map((walk) => (
+              <div
+                key={walk.id}
+                className="flex flex-col gap-3 rounded-[18px] bg-[var(--color-bg-subtle)] p-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+                    {walk.location}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
+                    {walk.mateName}님과 {walk.duration}분 · {walk.distance}km
+                  </p>
+                </div>
+                <span className="text-xs text-[var(--color-text-tertiary)]">
+                  {formatDate(walk.date)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="mt-5 overflow-hidden">
+          {MENU_ITEMS.map((item, index) => (
+            <button
+              key={item}
+              className={`flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)] ${
+                index < MENU_ITEMS.length - 1
+                  ? "border-b border-[var(--color-border-light)]"
+                  : ""
+              }`}
+            >
+              <span className="text-sm font-medium text-[var(--color-text-primary)]">
+                {item}
+              </span>
+              <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+            </button>
+          ))}
+        </Card>
       </div>
+    </div>
+  );
+};
+
+const MetricCard = ({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) => {
+  return (
+    <div className="rounded-[20px] border border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] p-4 text-center shadow-[var(--shadow-xs)]">
+      <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary-lighter)] text-[var(--color-primary)]">
+        {icon}
+      </div>
+      <p className="text-xs text-[var(--color-text-tertiary)]">{label}</p>
+      <p className="mt-1 text-lg font-bold text-[var(--color-text-primary)]">
+        {value}
+      </p>
+    </div>
+  );
+};
+
+const PreferenceCard = ({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string;
+  icon: ReactNode;
+}) => {
+  return (
+    <div className="rounded-[18px] bg-[var(--color-bg-subtle)] p-4">
+      <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-tertiary)]">
+        {icon}
+        {label}
+      </div>
+      <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+        {value}
+      </p>
     </div>
   );
 };

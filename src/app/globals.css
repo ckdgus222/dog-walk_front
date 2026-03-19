@@ -1,48 +1,242 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f9fa; /* Creamy White based on Bootstrap/Tailwind standard for soft background */
-  --foreground: #2d3748; /* Soft Dark Gray for text */
-  --primary: #ff8a3d; /* Soft Orange (Village Mate Signature) */
-  --primary-hover: #f2701d;
-  --secondary: #ffffff;
-  --muted: #718096;
-  --border: #e2e8f0;
+  --color-primary: #e8760a;
+  --color-primary-light: #f5a623;
+  --color-primary-lighter: #fff3e0;
+  --color-primary-dark: #c45e00;
+
+  --color-bg: #fafaf7;
+  --color-bg-elevated: #ffffff;
+  --color-bg-subtle: #f5f3ef;
+  --color-bg-muted: #edebe6;
+  --color-border: #e5e2db;
+  --color-border-light: #f0ede7;
+
+  --color-text-primary: #2c2825;
+  --color-text-secondary: #6b6560;
+  --color-text-tertiary: #9c958e;
+  --color-text-inverse: #ffffff;
+
+  --color-success: #34a853;
+  --color-success-light: #e6f4ea;
+  --color-warning: #f5a623;
+  --color-warning-light: #fff8e7;
+  --color-error: #ea4335;
+  --color-error-light: #fce8e6;
+  --color-info: #4a90d9;
+  --color-info-light: #e8f0fe;
+
+  --background: var(--color-bg);
+  --foreground: var(--color-text-primary);
+  --primary: var(--color-primary);
+  --primary-hover: var(--color-primary-dark);
+  --secondary: var(--color-bg-elevated);
+  --muted: var(--color-text-secondary);
+  --border: var(--color-border);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  --leading-tight: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 28px;
+  --radius-full: 9999px;
+
+  --shadow-xs: 0 1px 2px rgba(44, 40, 37, 0.04);
+  --shadow-sm: 0 1px 3px rgba(44, 40, 37, 0.06),
+    0 1px 2px rgba(44, 40, 37, 0.04);
+  --shadow-md: 0 4px 12px rgba(44, 40, 37, 0.08),
+    0 1px 3px rgba(44, 40, 37, 0.04);
+  --shadow-lg: 0 8px 24px rgba(44, 40, 37, 0.1),
+    0 2px 6px rgba(44, 40, 37, 0.04);
+  --shadow-xl: 0 20px 56px rgba(44, 40, 37, 0.14),
+    0 4px 14px rgba(44, 40, 37, 0.05);
+
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  --header-height: 64px;
+  --bottom-nav-height: 72px;
+  --sidebar-width: 400px;
+  --max-content-width: 1280px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text-primary);
+  --font-sans: var(--font-inter, system-ui), sans-serif;
+}
 
-  /* Village Mate Colors */
-  --color-orange-500: var(--primary);
-  --color-orange-600: var(--primary-hover);
-  --color-gray-50: #f8f9fa;
-  --color-gray-100: #f1f3f5;
-  --color-gray-200: #e9ecef;
-  --color-gray-500: #adb5bd;
-  --color-gray-600: #868e96;
-  --color-gray-700: #495057;
-  --color-gray-800: #343a40;
-  --color-gray-900: #212529;
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
 
-  --radius-2xl: 1rem;
+html {
+  height: 100%;
+  background: var(--color-bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-inter, system-ui), sans-serif;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
 }
 
-/* Hide Scrollbar but keep functionality */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(232, 118, 10, 0.18);
+  color: var(--color-text-primary);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+.hide-scrollbar,
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar,
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+
+.surface-card {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-md);
+}
+
+.surface-muted {
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-light);
+}
+
+.soft-ring {
+  box-shadow: 0 0 0 4px rgba(232, 118, 10, 0.12);
+}
+
+@keyframes auth-enter-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-20px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes auth-enter-right {
+  from {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.auth-route-enter-left {
+  animation: auth-enter-left 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.auth-route-enter-right {
+  animation: auth-enter-right 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.map-detail-panel-shell {
+  transition:
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 240ms ease,
+    border-color 240ms ease;
+}
+
+.map-detail-panel-inner {
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 240ms ease;
+  will-change: transform, opacity;
+}
+
+.map-detail-panel-enter {
+  animation: auth-enter-right 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-route-enter-left,
+  .auth-route-enter-right,
+  .map-detail-panel-enter {
+    animation: none;
+  }
+
+  .map-detail-panel-shell,
+  .map-detail-panel-inner {
+    transition: none;
+  }
 }

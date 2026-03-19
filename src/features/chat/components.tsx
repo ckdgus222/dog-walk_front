@@ -1,74 +1,162 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  CalendarClock,
   ChevronLeft,
-  Send,
+  Clock3,
+  MapPin,
   MoreVertical,
   Plus,
-  Image as ImageIcon,
+  Send,
 } from "lucide-react";
-import { Avatar, Input, Button } from "@/components/ui";
-import { cn, formatRelativeTime, formatTime } from "@/lib/utils";
+import { Avatar, Badge, EmptyState } from "@/components/ui";
+import { cn, formatDate, formatRelativeTime, formatTime } from "@/lib/utils";
 import { ROUTES } from "@/routes";
-import { ChatRoom, getChatMessages, getChatRoom } from "@/lib/mock/chat";
+import {
+  ChatMessage,
+  ChatRoom,
+  getChatMessages,
+  getChatRoom,
+} from "@/lib/mock/chat";
 
-// ============ ChatListItem ============
+const ROOM_META: Record<
+  string,
+  {
+    status: string;
+    tone: string;
+    helper: string;
+    appointment?: {
+      title: string;
+      time: string;
+      location: string;
+      note: string;
+    };
+  }
+> = {
+  "room-1": {
+    status: "약속 확정",
+    tone: "bg-[var(--color-success-light)] text-[var(--color-success)]",
+    helper: "내일 오전 10시 산책 예정",
+    appointment: {
+      title: "산책 약속이 잡혔어요",
+      time: "내일 오전 10:00",
+      location: "여의도 한강공원",
+      note: "산책 시작 전에 채팅으로 도착 여부를 한 번 더 확인해보세요.",
+    },
+  },
+  "room-2": {
+    status: "산책 완료",
+    tone: "bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]",
+    helper: "함께 산책한 메이트",
+  },
+  "room-3": {
+    status: "대화 중",
+    tone: "bg-[var(--color-primary-lighter)] text-[var(--color-primary-dark)]",
+    helper: "다음 산책 일정 조율 중",
+  },
+  "room-4": {
+    status: "요청 도착",
+    tone: "bg-[var(--color-warning-light)] text-[var(--color-warning)]",
+    helper: "첫 인사를 기다리는 중",
+  },
+};
+
+const getRoomMeta = (roomId: string) =>
+  ROOM_META[roomId] ?? {
+    status: "대화 중",
+    tone: "bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]",
+    helper: "산책 메이트와 대화 중",
+  };
+
+const getRoomSearchText = (room: ChatRoom) =>
+  `${room.participant.name} ${room.participant.dogName} ${room.lastMessage}`.toLowerCase();
+
+const getPartnerBubbleColor = (roomId: string) => {
+  if (roomId === "room-1") return "bg-[rgba(255,243,224,0.78)]";
+  if (roomId === "room-2") return "bg-[rgba(230,244,234,0.82)]";
+  if (roomId === "room-3") return "bg-[rgba(232,240,254,0.82)]";
+  return "bg-[var(--color-bg-elevated)]";
+};
+
 interface ChatListItemProps {
   room: ChatRoom;
   isSelected?: boolean;
 }
 
 export const ChatListItem = ({ room, isSelected }: ChatListItemProps) => {
+  const meta = getRoomMeta(room.id);
+
   return (
     <Link
       href={ROUTES.CHAT_ROOM(room.id)}
       className={cn(
-        "flex items-center gap-4 p-4 border-b border-[#F1F3F5] transition-colors hover:bg-[#F8F9FA]",
-        isSelected && "bg-[#F8F9FA]",
+        "block rounded-[20px] border p-4 transition-all",
+        isSelected
+          ? "border-[var(--color-primary)] bg-[rgba(255,243,224,0.46)] shadow-[var(--shadow-md)]"
+          : "border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] hover:border-[var(--color-border)] hover:shadow-[var(--shadow-sm)]",
       )}
     >
-      <div className="relative shrink-0">
-        <Avatar size="lg" className="w-12 h-12 border-[#E9ECEF]" />
-        {/* Unread Dot (Simple) */}
-        {room.unreadCount > 0 && (
-          <span className="absolute top-0 right-0 w-3 h-3 bg-[#FF8A3D] rounded-full border-2 border-white"></span>
-        )}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-0.5">
-          <span className="font-bold text-[15px] text-[#212529]">
-            {room.participant.name}
-          </span>
-          <span className="text-[11px] text-[#ADB5BD]">
-            {formatRelativeTime(room.lastMessageTime)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <p
-            className={cn(
-              "text-sm truncate max-w-[200px]",
-              room.unreadCount > 0
-                ? "text-[#495057] font-medium"
-                : "text-[#868E96]",
-            )}
-          >
-            {room.lastMessage}
-          </p>
+      <div className="flex items-start gap-3">
+        <div className="relative shrink-0">
+          <Avatar
+            alt={room.participant.name}
+            size="md"
+            className="h-12 w-12 border-[var(--color-border-light)]"
+          />
           {room.unreadCount > 0 && (
-            <span className="bg-[#FF8A3D] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-              {room.unreadCount}
-            </span>
+            <span className="absolute -right-0.5 -top-0.5 h-4 w-4 rounded-full border-2 border-white bg-[var(--color-primary)]" />
           )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="truncate text-sm font-bold text-[var(--color-text-primary)]">
+                  {room.participant.name}
+                </span>
+                {room.participant.mannerScore && (
+                  <Badge className="bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]">
+                    {room.participant.mannerScore}°C
+                  </Badge>
+                )}
+                <Badge className={meta.tone}>{meta.status}</Badge>
+              </div>
+              <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
+                {room.participant.dogName} · {meta.helper}
+              </p>
+            </div>
+
+            <span className="shrink-0 text-[11px] text-[var(--color-text-tertiary)]">
+              {formatRelativeTime(room.lastMessageTime)}
+            </span>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <p
+              className={cn(
+                "truncate text-sm",
+                room.unreadCount > 0
+                  ? "font-medium text-[var(--color-text-primary)]"
+                  : "text-[var(--color-text-secondary)]",
+              )}
+            >
+              {room.lastMessage}
+            </p>
+            {room.unreadCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-primary)] px-1.5 text-[10px] font-bold text-white">
+                {room.unreadCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </Link>
   );
 };
 
-// ============ ChatList ============
 interface ChatListProps {
   rooms: ChatRoom[];
   selectedRoomId?: string;
@@ -76,7 +164,7 @@ interface ChatListProps {
 
 export const ChatList = ({ rooms, selectedRoomId }: ChatListProps) => {
   return (
-    <div className="bg-white">
+    <div className="space-y-3 p-3">
       {rooms.map((room) => (
         <ChatListItem
           key={room.id}
@@ -88,7 +176,6 @@ export const ChatList = ({ rooms, selectedRoomId }: ChatListProps) => {
   );
 };
 
-// ============ ChatWindow ============
 interface ChatWindowProps {
   roomId: string;
   showHeader?: boolean;
@@ -98,150 +185,257 @@ export const ChatWindow = ({
   roomId,
   showHeader = true,
 }: ChatWindowProps) => {
-  const [inputValue, setInputValue] = useState("");
   const room = getChatRoom(roomId);
-  const messages = getChatMessages(roomId);
+  const initialMessages = useMemo(() => getChatMessages(roomId), [roomId]);
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [inputValue, setInputValue] = useState("");
   const currentUserId = "user-1";
 
-  if (!room) return <div className="p-4">채팅방을 찾을 수 없습니다.</div>;
+  if (!room) {
+    return (
+      <div className="flex h-full items-center justify-center bg-[var(--color-bg)]">
+        <EmptyState
+          icon={<span>💬</span>}
+          title="채팅방을 찾을 수 없어요"
+          description="목록으로 돌아가 다른 메이트와의 대화를 확인해보세요."
+        />
+      </div>
+    );
+  }
+
+  const roomMeta = getRoomMeta(room.id);
+  const roomDate =
+    messages.length > 0 ? formatDate(messages[0].createdAt) : formatDate(new Date());
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `message-${Date.now()}`,
+        roomId,
+        senderId: currentUserId,
+        content: inputValue.trim(),
+        createdAt: new Date(),
+        isRead: false,
+      },
+    ]);
     setInputValue("");
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#E9ECEF]/30">
-      {/* Header */}
+    <div className="flex h-full min-h-0 flex-col bg-[var(--color-bg)]">
       {showHeader && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-[#F1F3F5] shrink-0">
+        <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] px-4 py-3">
           <Link
             href={ROUTES.CHAT}
-            className="p-1 -ml-1 mr-1 lg:hidden text-[#212529]"
+            className="rounded-xl p-1.5 text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-subtle)] md:hidden"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="h-5 w-5" />
           </Link>
-          <div className="flex-1">
-            <h2 className="font-bold text-base text-[#212529] cursor-pointer hover:underline">
-              {room.participant.name}
-            </h2>
-            <span className="text-[11px] text-[#ADB5BD] bg-[#F1F3F5] px-1.5 py-0.5 rounded">
-              매너 {room.participant.mannerScore}°C
-            </span>
-          </div>
-          <button className="text-[#868E96] p-2 hover:bg-[#F8F9FA] rounded-full">
-            <MoreVertical className="w-5 h-5" />
+
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <Avatar
+              alt={room.participant.name}
+              size="md"
+              className="h-10 w-10 border-[var(--color-border-light)]"
+            />
+
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <h2 className="truncate text-sm font-bold text-[var(--color-text-primary)]">
+                  {room.participant.name}
+                </h2>
+                {room.participant.mannerScore && (
+                  <Badge className="bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]">
+                    {room.participant.mannerScore}°C
+                  </Badge>
+                )}
+                <Badge className={roomMeta.tone}>{roomMeta.status}</Badge>
+              </div>
+              <p className="mt-1 truncate text-xs text-[var(--color-text-tertiary)]">
+                {room.participant.dogName} · {roomMeta.helper}
+              </p>
+            </div>
+        </div>
+
+          <button className="rounded-xl p-2 text-[var(--color-text-tertiary)] transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]">
+            <MoreVertical className="h-[18px] w-[18px]" />
           </button>
         </div>
       )}
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {/* Date Divider Example */}
-        <div className="flex justify-center my-4">
-          <span className="bg-[#000000]/10 text-white text-[10px] px-3 py-1 rounded-full font-medium shadow-sm backdrop-blur-sm">
-            2025년 5월 20일
-          </span>
-        </div>
+      <div className="flex-1 overflow-y-auto px-4 py-5 hide-scrollbar">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+          <div className="flex justify-center">
+            <span className="rounded-full bg-[var(--color-bg-subtle)] px-3 py-1 text-[11px] font-medium text-[var(--color-text-tertiary)]">
+              {roomDate}
+            </span>
+          </div>
 
-        {messages.map((message, index) => {
-          const isMe = message.senderId === currentUserId;
-          const showProfile =
-            !isMe &&
-            (index === 0 || messages[index - 1].senderId !== message.senderId);
-
-          return (
-            <div
-              key={message.id}
-              className={cn(
-                "flex w-full",
-                isMe ? "justify-end" : "justify-start",
-              )}
-            >
-              {/* Partner Profile */}
-              {!isMe && (
-                <div className="w-8 mr-2 flex flex-col items-center shrink-0">
-                  {showProfile ? <Avatar size="sm" /> : <div className="w-8" />}
-                </div>
-              )}
-
-              <div className="max-w-[70%]">
-                {!isMe && showProfile && (
-                  <p className="text-[11px] text-[#495057] mb-1 ml-1">
-                    {room.participant.name}
+          {roomMeta.appointment && (
+            <div className="rounded-[24px] border border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] p-4 shadow-[var(--shadow-sm)]">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold text-[var(--color-primary)]">
+                    WALK COORDINATION
                   </p>
-                )}
-                <div className="flex items-end gap-1.5 direction">
-                  {isMe && (
-                    <span className="text-[10px] text-[#ADB5BD] mb-1 whitespace-nowrap">
-                      {formatTime(message.createdAt)}
-                    </span>
-                  )}
-                  <div
-                    className={cn(
-                      "px-3 py-2.5 text-[14px] leading-snug break-words shadow-sm",
-                      isMe
-                        ? "bg-[#FF8A3D] text-white rounded-[18px_4px_18px_18px]"
-                        : "bg-white text-[#212529] rounded-[4px_18px_18px_18px] border border-[#F1F3F5]",
-                    )}
-                  >
-                    {message.content}
+                  <h3 className="mt-1 text-base font-bold text-[var(--color-text-primary)]">
+                    {roomMeta.appointment.title}
+                  </h3>
+                </div>
+                <Badge className={roomMeta.tone}>{roomMeta.status}</Badge>
+              </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-[18px] bg-[var(--color-bg-subtle)] p-3">
+                  <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-[var(--color-text-tertiary)]">
+                    <CalendarClock className="h-3.5 w-3.5" />
+                    시간
                   </div>
-                  {!isMe && (
-                    <span className="text-[10px] text-[#ADB5BD] mb-1 whitespace-nowrap text-right">
-                      {formatTime(message.createdAt)}
-                    </span>
-                  )}
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+                    {roomMeta.appointment.time}
+                  </p>
+                </div>
+                <div className="rounded-[18px] bg-[var(--color-bg-subtle)] p-3">
+                  <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-[var(--color-text-tertiary)]">
+                    <MapPin className="h-3.5 w-3.5" />
+                    장소
+                  </div>
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+                    {roomMeta.appointment.location}
+                  </p>
                 </div>
               </div>
+
+              <p className="mt-3 text-xs leading-relaxed text-[var(--color-text-secondary)]">
+                {roomMeta.appointment.note}
+              </p>
             </div>
-          );
-        })}
+          )}
+
+          {messages.map((message, index) => {
+            const isMe = message.senderId === currentUserId;
+            const previousMessage = messages[index - 1];
+            const showProfile =
+              !isMe &&
+              (!previousMessage || previousMessage.senderId !== message.senderId);
+
+            return (
+              <div
+                key={message.id}
+                className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}
+              >
+                {!isMe && (
+                  <div className="mr-2 flex w-8 shrink-0 justify-center">
+                    {showProfile ? (
+                      <Avatar
+                        alt={room.participant.name}
+                        size="sm"
+                        className="h-8 w-8 border-[var(--color-border-light)]"
+                      />
+                    ) : (
+                      <div className="w-8" />
+                    )}
+                  </div>
+                )}
+
+                <div className="max-w-[78%]">
+                  {!isMe && showProfile && (
+                    <p className="mb-1 ml-1 text-[11px] font-medium text-[var(--color-text-secondary)]">
+                      {room.participant.name}
+                    </p>
+                  )}
+
+                  <div
+                    className={cn(
+                      "flex items-end gap-2",
+                      isMe && "flex-row-reverse",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "rounded-[22px] px-4 py-3 text-sm leading-relaxed shadow-[var(--shadow-xs)]",
+                        isMe
+                          ? "rounded-br-md bg-[var(--color-primary)] text-white"
+                          : `rounded-bl-md border border-[var(--color-border-light)] text-[var(--color-text-primary)] ${getPartnerBubbleColor(room.id)}`,
+                      )}
+                    >
+                      {message.content}
+                    </div>
+                    <span className="mb-1 shrink-0 text-[10px] text-[var(--color-text-tertiary)]">
+                      {formatTime(message.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Input Area */}
-      <div className="p-3 bg-white border-t border-[#F1F3F5] shrink-0 safe-area-bottom">
-        <div className="flex items-center gap-2">
-          <button className="p-2 text-[#ADB5BD] bg-[#F8F9FA] rounded-full hover:text-[#495057]">
-            <Plus className="w-5 h-5" />
+      <div className="shrink-0 border-t border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+        <div className="mx-auto flex w-full max-w-3xl items-end gap-2">
+          <button className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-2.5 text-[var(--color-text-tertiary)] transition-colors hover:bg-[var(--color-bg-subtle)]">
+            <Plus className="h-[18px] w-[18px]" />
           </button>
-          <div className="flex-1 bg-[#F8F9FA] rounded-[20px] px-4 py-2 flex items-center border border-transparent focus-within:border-[#FF8A3D]/50 transition-colors">
+          <div className="flex flex-1 items-center gap-2 rounded-[20px] border border-[var(--color-border)] bg-[var(--color-bg-subtle)] px-4 py-3 focus-within:border-[var(--color-primary)] focus-within:ring-4 focus-within:ring-[rgba(232,118,10,0.1)]">
             <input
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="메시지 보내기"
-              className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-[#ADB5BD]"
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              onChange={(event) => setInputValue(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSend();
+                }
+              }}
+              placeholder="메시지를 입력하세요"
+              className="min-w-0 flex-1 bg-transparent text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)]"
             />
+            <Clock3 className="h-4 w-4 text-[var(--color-text-tertiary)]" />
           </div>
-          {inputValue.trim() ? (
-            <button
-              onClick={handleSend}
-              className="p-2 bg-[#FF8A3D] text-white rounded-full transition-transform hover:scale-110 shadow-sm"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          ) : // Placeholder button
-          null}
+          <button
+            onClick={handleSend}
+            disabled={!inputValue.trim()}
+            className="rounded-xl bg-[var(--color-primary)] p-2.5 text-white shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--color-primary-dark)] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Send className="h-[18px] w-[18px]" />
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-// ============ ChatEmptyState ============
 export const ChatEmptyState = () => {
-  /* Desktop Only View */
   return (
-    <div className="hidden lg:flex flex-col items-center justify-center h-full bg-[#F8F9FA] text-center p-8">
-      <div className="w-20 h-20 bg-[#FFF4E6] rounded-full flex items-center justify-center mb-4">
-        <span className="text-4xl">💬</span>
+    <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg)] p-8">
+      <div className="max-w-md rounded-[28px] border border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] p-8 text-center shadow-[var(--shadow-lg)]">
+        <div className="mx-auto mb-4 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[var(--color-primary-lighter)] text-4xl">
+          💬
+        </div>
+        <p className="text-xs font-semibold text-[var(--color-primary)]">
+          WALK COORDINATION CHAT
+        </p>
+        <h3 className="mt-2 text-2xl font-bold text-[var(--color-text-primary)]">
+          대화를 선택하세요
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+          산책 약속을 조율하고, 장소와 시간을 확인하고,
+          <br />
+          자연스럽게 메이트와 신뢰를 쌓을 수 있어요.
+        </p>
       </div>
-      <p className="text-[#868E96] text-sm leading-relaxed">
-        동네 이웃들과 따뜻한 대화를 나눠보세요.
-        <br />
-        산책 약속을 잡을 때도 유용해요!
-      </p>
     </div>
   );
+};
+
+export const filterChatRooms = (rooms: ChatRoom[], searchQuery: string) => {
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return rooms;
+  }
+
+  return rooms.filter((room) => getRoomSearchText(room).includes(normalizedQuery));
 };

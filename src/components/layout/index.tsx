@@ -4,137 +4,96 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Map,
-  Newspaper,
-  MessageCircle,
-  User,
   Bell,
-  Search,
-  Dog,
+  Map,
+  MessageCircle,
+  Newspaper,
+  PawPrint,
+  User,
 } from "lucide-react";
+import { Avatar } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/routes";
-import { InteractiveBackground } from "./InteractiveBackground";
-import { Avatar } from "@/components/ui";
 
-// ============ AppShell (Glass Modal Layout) ============
 interface AppShellProps {
   children: ReactNode;
 }
 
 export const AppShell = ({ children }: AppShellProps) => {
   return (
-    <>
-      <InteractiveBackground />
+    <div className="min-h-screen bg-[var(--color-bg)]">
+      <DesktopHeader />
 
-      {/* 
-         Overlay Wrapper 
-         - Desktop: Center Modal 
-         - Mobile: Full Screen 
-      */}
-      <div className="fixed inset-0 z-0 flex items-center justify-center p-0 lg:p-8 overflow-hidden">
-        {/* Glass Container */}
-        <div
-          className="
-            relative w-full h-full lg:max-w-[1600px] lg:h-[90vh] 
-            bg-white/80 backdrop-blur-2xl 
-            lg:rounded-[32px] lg:border lg:border-white/40 
-            shadow-2xl overflow-hidden flex flex-col
-            transition-all duration-500 ease-out
-        "
-        >
-          {/* Top Navigation (Inside Glass) */}
-          <GlassTopNav />
+      <main className="min-h-screen overflow-hidden pb-[var(--bottom-nav-height)] md:pb-0 md:pt-[var(--header-height)]">
+        <div className="h-full">{children}</div>
+      </main>
 
-          {/* Main Content Area */}
-          <main className="flex-1 w-full relative overflow-hidden flex flex-col">
-            {/* Scrollable Content Wrapper */}
-            <div className="flex-1 overflow-y-auto no-scrollbar pb-[70px] lg:pb-0 scroll-smooth">
-              {children}
-            </div>
-          </main>
-
-          {/* Mobile Bottom Navigation (Visible only on mobile) */}
-          <div className="lg:hidden absolute bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-white/20 pb-[env(safe-area-inset-bottom)] z-50">
-            <MobileNav />
-          </div>
-        </div>
-      </div>
-    </>
+      <MobileNav />
+    </div>
   );
 };
 
-// ============ GlassTopNav ============
-const GlassTopNav = () => {
+const DesktopHeader = () => {
   const pathname = usePathname();
 
   return (
-    <header className="hidden lg:flex shrink-0 h-20 items-center justify-between px-8 border-b border-white/20 bg-white/40 backdrop-blur-sm z-50">
-      {/* Brand */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-[#FF8A3D] to-[#FF6B6B] rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
-          <Dog className="w-6 h-6" />
-        </div>
-        <span className="font-extrabold text-2xl text-[#2D3748] tracking-tight">
-          Village<span className="text-[#FF8A3D]">Mate</span>
-        </span>
-      </div>
-
-      {/* Center Menu */}
-      <nav className="flex items-center gap-2 bg-white/50 px-2 py-1.5 rounded-full border border-white/40 shadow-sm backdrop-blur-md">
-        {NAV_ITEMS.map((item) => {
-          const isActive = pathname?.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300",
-                isActive
-                  ? "bg-[#2D3748] text-white shadow-md transform scale-105"
-                  : "text-[#718096] hover:bg-white/60 hover:text-[#2D3748]",
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Right Options */}
-      <div className="flex items-center gap-4">
-        <div className="relative group hidden xl:block">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A0AEC0] group-hover:text-[#FF8A3D] transition-colors" />
-          <input
-            type="text"
-            placeholder="Search neighborhood..."
-            className="pl-11 pr-4 py-2.5 bg-white/50 border border-white/40 rounded-full text-sm w-64 focus:outline-none focus:ring-2 focus:ring-[#FF8A3D]/20 focus:bg-white transition-all shadow-sm"
-          />
-        </div>
-        <button className="p-2.5 text-[#4A5568] hover:bg-white/60 rounded-full transition-all relative group">
-          <Bell className="w-5 h-5 group-hover:animate-swing" />
-          <span className="absolute top-2.5 right-3 w-2 h-2 bg-[#FF4757] rounded-full border-2 border-white"></span>
-        </button>
-        <div className="h-8 w-px bg-gray-200 mx-1"></div>
-        <button className="flex items-center gap-3 pl-1 pr-2 py-1 hover:bg-white/50 rounded-full transition-all">
-          <Avatar
-            size="sm"
-            className="w-9 h-9 border-2 border-white shadow-sm"
-          />
-          <div className="text-left hidden xl:block">
-            <p className="text-xs font-bold text-[#2D3748]">Golden Retriever</p>
-            <p className="text-[10px] text-[#718096]">Premium Member</p>
+    <header
+      className="fixed inset-x-0 top-0 hidden border-b border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] md:block"
+      style={{ zIndex: "var(--z-sticky)", height: "var(--header-height)" }}
+    >
+      <div className="mx-auto flex h-full max-w-[var(--max-content-width)] items-center justify-between px-6">
+        <Link href="/map" className="group flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-primary)] text-white transition-transform group-hover:scale-105">
+            <PawPrint className="h-5 w-5" />
           </div>
-        </button>
+          <span className="text-lg font-bold tracking-[-0.01em] text-[var(--color-text-primary)]">
+            산책메이트
+          </span>
+        </Link>
+
+        <nav className="flex items-center gap-1">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname?.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-[var(--color-primary-lighter)] text-[var(--color-primary)]"
+                    : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]",
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <button className="relative rounded-lg p-2 text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]">
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-[var(--color-primary)]" />
+          </button>
+
+          <Link
+            href="/mypage"
+            className="overflow-hidden rounded-full ring-2 ring-[var(--color-border-light)] transition-all hover:ring-[var(--color-primary-light)]"
+          >
+            <Avatar
+              size="sm"
+              className="h-8 w-8 border-transparent"
+            />
+          </Link>
+        </div>
       </div>
     </header>
   );
 };
 
-// ============ MobileNav ============
 const MobileNav = () => {
   const pathname = usePathname();
-  // Safe Icon Mapping
   const iconMap: Record<string, React.ElementType> = {
     Map,
     Newspaper,
@@ -143,52 +102,44 @@ const MobileNav = () => {
   };
 
   return (
-    <div className="flex items-center justify-around h-16 px-4">
-      {NAV_ITEMS.map((item) => {
-        const Icon = iconMap[item.icon] || Map;
-        const isActive = pathname?.startsWith(item.href);
+    <nav
+      className="fixed inset-x-0 bottom-0 border-t border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] md:hidden"
+      style={{ zIndex: "var(--z-sticky)", height: "var(--bottom-nav-height)" }}
+    >
+      <div className="flex h-full items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+        {NAV_ITEMS.map((item) => {
+          const Icon = iconMap[item.icon] || Map;
+          const isActive = pathname?.startsWith(item.href);
 
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "relative flex flex-col items-center justify-center flex-1 h-full gap-1 active:scale-95 transition-transform",
-              isActive ? "text-[#FF8A3D]" : "text-[#A0AEC0]",
-            )}
-          >
-            {isActive && (
-              <span className="absolute -top-0.5 w-8 h-1 bg-[#FF8A3D] rounded-full shadow-[0_2px_8px_rgba(255,138,61,0.4)]" />
-            )}
-            <Icon
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
               className={cn(
-                "w-6 h-6 transition-all",
-                isActive && "transform -translate-y-0.5",
-              )}
-              strokeWidth={isActive ? 2.5 : 2}
-            />
-            <span
-              className={cn(
-                "text-[10px] transition-all",
-                isActive ? "font-bold opacity-100" : "font-medium opacity-80",
+                "flex flex-col items-center gap-1 rounded-xl px-3 py-2 text-[10px] font-medium transition-colors",
+                isActive
+                  ? "text-[var(--color-primary)]"
+                  : "text-[var(--color-text-tertiary)]",
               )}
             >
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
-    </div>
+              <Icon
+                className={cn("h-5 w-5 transition-transform", isActive && "scale-105")}
+                strokeWidth={isActive ? 2.5 : 2}
+              />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 };
 
-// ============ Header Utils (Mobile Only) ============
-
 export const LocationHeader = () => {
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md px-4 h-14 flex items-center justify-between border-b border-[#F1F3F5] lg:hidden">
-      <button className="flex items-center gap-1 font-bold text-lg text-[#2D3748]">
-        역삼 1동
+    <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] px-4 md:hidden">
+      <button className="flex items-center gap-1 text-lg font-bold text-[var(--color-text-primary)]">
+        역삼1동
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -199,28 +150,38 @@ export const LocationHeader = () => {
           strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="mt-0.5 text-[#CBD5E0]"
+          className="mt-0.5 text-[var(--color-text-tertiary)]"
         >
           <path d="m6 9 6 6 6-6" />
         </svg>
       </button>
       <div className="flex items-center gap-2">
-        <button className="p-2 text-[#2D3748]">
-          <Bell className="w-6 h-6" />
+        <button className="rounded-xl p-2 text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-subtle)]">
+          <Bell className="h-5 w-5" />
         </button>
       </div>
     </header>
   );
 };
 
-export const PageHeader = ({ title, action, backButton }: any) => {
+interface PageHeaderProps {
+  title: string;
+  action?: ReactNode;
+  backButton?: boolean;
+}
+
+export const PageHeader = ({
+  title,
+  action,
+  backButton,
+}: PageHeaderProps) => {
   return (
-    <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#F1F3F5] h-14 flex items-center justify-between px-4 lg:hidden">
+    <div className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] px-4 md:hidden">
       <div className="flex items-center gap-3">
         {backButton && (
           <button
             onClick={() => window.history.back()}
-            className="text-[#2D3748] p-1 -ml-1"
+            className="-ml-1 rounded-lg p-1 text-[var(--color-text-primary)]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -237,7 +198,9 @@ export const PageHeader = ({ title, action, backButton }: any) => {
             </svg>
           </button>
         )}
-        <h1 className="font-bold text-lg text-[#2D3748]">{title}</h1>
+        <h1 className="text-lg font-bold text-[var(--color-text-primary)]">
+          {title}
+        </h1>
       </div>
       {action}
     </div>

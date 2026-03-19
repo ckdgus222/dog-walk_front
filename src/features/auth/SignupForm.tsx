@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Dog } from "lucide-react";
-import { Input, Button } from "@/components/ui";
+import {
+  CalendarDays,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Dog,
+  Lock,
+  Mail,
+  PawPrint,
+} from "lucide-react";
+import { Button, Input } from "@/components/ui";
 import { ROUTES } from "@/routes";
 
 const STEPS = [
-  { number: 1, label: "계정 정보" },
-  { number: 2, label: "강아지 정보" },
+  { number: 1, label: "기본 정보" },
+  { number: 2, label: "반려견 정보" },
 ] as const;
 
 const DOG_GENDERS = [
@@ -44,7 +53,7 @@ export const SignupForm = () => {
   const [formValues, setFormValues] =
     useState<SignupFormValues>(INITIAL_FORM_VALUES);
 
-  const handleFieldChange = <K extends keyof SignupFormValues,>(
+  const handleFieldChange = <K extends keyof SignupFormValues>(
     field: K,
     value: SignupFormValues[K],
   ) => {
@@ -91,105 +100,103 @@ export const SignupForm = () => {
     setStep(1);
   };
 
-
   const handleSubmit = () => {
     console.log("회원가입 폼 값", formValues);
   };
 
   return (
-    <div className="flex flex-col max-h-[90dvh]">
-      <div className="shrink-0 pt-8 pb-4 px-8 text-center">
-        <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-[#FF8A3D] to-[#FF6B6B] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
-          <Dog className="w-7 h-7" />
+    <div className="mx-auto w-full max-w-md">
+      <div className="text-center">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-primary)] text-white">
+          <PawPrint className="h-7 w-7" />
         </div>
-        <h1 className="text-xl font-extrabold text-[#2D3748] tracking-tight">
+        <h1 className="text-xl font-bold tracking-[-0.02em] text-[var(--color-text-primary)]">
           회원가입
         </h1>
+        <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
+          계정과 반려견 정보를 등록해 산책 메이트를 찾아보세요.
+        </p>
       </div>
 
-      <div className="shrink-0 px-8 pb-4">
-        <div className="flex gap-2">
-          {STEPS.map((s) => (
+      <div className="mt-8 flex items-center justify-center gap-2">
+        {STEPS.map((currentStep) => (
+          <div key={currentStep.number} className="flex items-center gap-2">
             <div
-              key={s.number}
-              className="flex-1 flex flex-col items-center gap-1.5"
+              className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors ${
+                step >= currentStep.number
+                  ? "bg-[var(--color-primary)] text-white"
+                  : "bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]"
+              }`}
             >
-              <div className="w-full h-1 rounded-full overflow-hidden bg-[#F1F3F5]">
-                <div
-                  className="h-full rounded-full bg-[#FF8A3D] transition-all duration-500"
-                  style={{ width: step >= s.number ? "100%" : "0%" }}
-                />
-              </div>
-              <span
-                className={`text-xs font-semibold ${
-                  step >= s.number ? "text-[#FF8A3D]" : "text-[#ADB5BD]"
-                }`}
-              >
-                {s.label}
-              </span>
+              {step > currentStep.number ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                currentStep.number
+              )}
             </div>
-          ))}
-        </div>
+            {currentStep.number < STEPS.length && (
+              <div
+                className={`h-0.5 w-12 rounded-full transition-colors ${
+                  step > currentStep.number
+                    ? "bg-[var(--color-primary)]"
+                    : "bg-[var(--color-bg-muted)]"
+                }`}
+              />
+            )}
+          </div>
+        ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar px-8 pb-8">
+      <div className="mt-8 rounded-[24px] border border-[var(--color-border-light)] bg-[var(--color-bg-elevated)] p-6 shadow-[var(--shadow-sm)]">
         {step === 1 && (
           <div>
-            <div className="mb-5">
-              <h2 className="text-lg font-bold text-[#343A40]">
-                계정을 만들어주세요
-              </h2>
-              <p className="text-sm text-[#868E96] mt-0.5">
-                이메일과 비밀번호로 간편하게 가입할 수 있어요
-              </p>
-            </div>
+            <h2 className="text-lg font-bold text-[var(--color-text-primary)]">
+              기본 정보
+            </h2>
+            <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
+              계정 생성에 필요한 정보를 입력해주세요.
+            </p>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
-                  이메일
-                </label>
-                <Input
-                  type="email"
-                  placeholder="example@email.com"
-                  value={formValues.email}
-                  onChange={(e) => handleFieldChange("email", e.target.value)}
-                />
-              </div>
+            <div className="mt-5 space-y-3">
+              <Input
+                type="email"
+                placeholder="이메일"
+                value={formValues.email}
+                onChange={(event) =>
+                  handleFieldChange("email", event.target.value)
+                }
+                leftIcon={<Mail className="h-4 w-4" />}
+              />
 
-              <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
-                  비밀번호
-                </label>
-                <Input
-                  type="password"
-                  placeholder="8자 이상 입력해주세요"
-                  value={formValues.password}
-                  onChange={(e) => handleFieldChange("password", e.target.value)}
-                />
-              </div>
+              <Input
+                type="password"
+                placeholder="비밀번호"
+                value={formValues.password}
+                onChange={(event) =>
+                  handleFieldChange("password", event.target.value)
+                }
+                leftIcon={<Lock className="h-4 w-4" />}
+              />
 
-              <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
-                  비밀번호 확인
-                </label>
-                <Input
-                  type="password"
-                  placeholder="비밀번호를 다시 입력해주세요"
-                  value={formValues.passwordConfirm}
-                  onChange={(e) =>
-                    handleFieldChange("passwordConfirm", e.target.value)
-                  }
-                />
-              </div>
+              <Input
+                type="password"
+                placeholder="비밀번호 확인"
+                value={formValues.passwordConfirm}
+                onChange={(event) =>
+                  handleFieldChange("passwordConfirm", event.target.value)
+                }
+                leftIcon={<Lock className="h-4 w-4" />}
+              />
+
               {stepOneError && (
-                <p className="text-sm font-medium text-[#E03131]">
+                <div className="rounded-[16px] border border-[rgba(234,67,53,0.16)] bg-[var(--color-error-light)] px-3 py-2 text-sm font-medium text-[var(--color-error)]">
                   {stepOneError}
-                </p>
+                </div>
               )}
 
               <Button fullWidth size="lg" onClick={handleNextStep}>
                 다음
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -197,121 +204,104 @@ export const SignupForm = () => {
 
         {step === 2 && (
           <div>
-            <div className="mb-5">
-              <h2 className="text-lg font-bold text-[#343A40]">
-                반려견을 소개해주세요
-              </h2>
-              <p className="text-sm text-[#868E96] mt-0.5">
-                함께 산책할 강아지 정보를 입력해주세요
-              </p>
-            </div>
+            <h2 className="flex items-center gap-1.5 text-lg font-bold text-[var(--color-text-primary)]">
+              <Dog className="h-[18px] w-[18px] text-[var(--color-primary)]" />
+              반려견 정보
+            </h2>
+            <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
+              더 잘 맞는 산책 메이트를 추천하는 데 사용돼요.
+            </p>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
-                  강아지 이름
-                </label>
-                <Input
-                  type="text"
-                  placeholder="우리 강아지 이름을 알려주세요"
-                  value={formValues.dogName}
-                  onChange={(e) => handleFieldChange("dogName", e.target.value)}
-                />
-              </div>
+            <div className="mt-5 space-y-4">
+              <Input
+                type="text"
+                placeholder="강아지 이름"
+                value={formValues.dogName}
+                onChange={(event) =>
+                  handleFieldChange("dogName", event.target.value)
+                }
+                leftIcon={<Dog className="h-4 w-4" />}
+              />
 
-              <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
-                  견종
-                </label>
-                <Input
-                  type="text"
-                  placeholder="예: 골든 리트리버, 말티즈, 포메라니안"
-                  value={formValues.dogBreed}
-                  onChange={(e) => handleFieldChange("dogBreed", e.target.value)}
-                />
-              </div>
+              <Input
+                type="text"
+                placeholder="견종"
+                value={formValues.dogBreed}
+                onChange={(event) =>
+                  handleFieldChange("dogBreed", event.target.value)
+                }
+              />
 
               <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
+                <label className="mb-2 block text-xs font-semibold text-[var(--color-text-secondary)]">
                   성별
                 </label>
-                <div className="flex gap-3">
-                  {DOG_GENDERS.map((g) => {
-                    const isSelected = formValues.dogGender === g.value;
+                <div className="grid grid-cols-2 gap-2">
+                  {DOG_GENDERS.map((gender) => {
+                    const isSelected = formValues.dogGender === gender.value;
 
                     return (
                       <button
-                        key={g.value}
+                        key={gender.value}
                         type="button"
-                        onClick={() => handleFieldChange("dogGender", g.value)}
-                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 active:scale-95 ${
+                        onClick={() =>
+                          handleFieldChange("dogGender", gender.value)
+                        }
+                        className={`rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
                           isSelected
-                            ? "bg-[#FFF4E6] text-[#FF8A3D] ring-2 ring-[#FF8A3D]/20"
-                            : "bg-[#F8F9FA] text-[#868E96] hover:bg-[#F1F3F5]"
+                            ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+                            : "border-[var(--color-border-light)] bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-border)]"
                         }`}
                       >
-                        {g.value === "male" ? "♂" : "♀"} {g.label}
+                        {gender.label}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
-                  생년월일
-                </label>
-                <Input
-                  type="date"
-                  value={formValues.dogBirthDate}
-                  onChange={(e) =>
-                    handleFieldChange("dogBirthDate", e.target.value)
-                  }
-                />
-              </div>
+              <Input
+                type="date"
+                value={formValues.dogBirthDate}
+                onChange={(event) =>
+                  handleFieldChange("dogBirthDate", event.target.value)
+                }
+                leftIcon={<CalendarDays className="h-4 w-4" />}
+              />
 
-              <div>
-                <label className="block text-sm font-semibold text-[#343A40] mb-1.5">
-                  프로필 사진
-                </label>
-                <div className="flex items-center justify-center w-full h-28 rounded-xl border-2 border-dashed border-[#DEE2E6] bg-[#F8F9FA]">
-                  <div className="text-center">
-                    <span className="block text-2xl mb-1">📷</span>
-                    <span className="text-xs text-[#ADB5BD]">
-                      사진 업로드 (준비 중)
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-1">
+              <div className="flex gap-3 pt-2">
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   size="lg"
-                  fullWidth
+                  className="flex-1"
                   onClick={handlePrevStep}
                 >
+                  <ChevronLeft className="h-4 w-4" />
                   이전
                 </Button>
-                <Button size="lg" fullWidth onClick={handleSubmit}>
-                  가입 완료
+                <Button
+                  size="lg"
+                  fullWidth
+                  className="flex-1"
+                  onClick={handleSubmit}
+                >
+                  시작하기
                 </Button>
               </div>
             </div>
           </div>
         )}
-        <div className="text-center pt-6">
-          <p className="text-sm text-[#868E96]">
-            이미 계정이 있으신가요?{" "}
-            <Link
-              href={ROUTES.LOGIN}
-              className="font-bold text-[#FF8A3D] hover:text-[#F2701D] transition-colors"
-            >
-              로그인
-            </Link>
-          </p>
-        </div>
       </div>
+
+      <p className="mt-8 text-center text-sm text-[var(--color-text-tertiary)]">
+        이미 계정이 있으신가요?{" "}
+        <Link
+          href={ROUTES.LOGIN}
+          className="font-semibold text-[var(--color-primary)] hover:underline"
+        >
+          로그인
+        </Link>
+      </p>
     </div>
   );
 };
